@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Шаг 8 — Обработка последнего блока Yq | MD5pider</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f4f6f8;
+      color: #333;
+      margin: 0;
+      padding: 80px 20px 20px;
+      user-select: none;
+    }
+    .nav-top {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      background: #fff;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      padding: 10px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 1000;
+    }
+    .btn {
+      padding: 10px 16px;
+      background: #1976d2;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      text-decoration: none;
+      user-select: none;
+      min-width: 90px;
+      margin-left: 8px;
+    }
+    .btn:hover:not(:disabled) {
+      background: #0d47a1;
+    }
+    .btn:disabled {
+      background: #90a4ae;
+      cursor: default;
+    }
+    .btn-final {
+      background: #4caf50;
+    }
+    .btn-final:hover {
+      background: #388e3c;
+    }
+    .container {
+      max-width: 1000px;
+      margin: auto;
+      background: white;
+      border-radius: 12px;
+      padding: 30px 40px 40px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+      user-select: text;
+    }
+    h2 {
+      color: #424242;
+      margin-top: 0;
+      text-align: center;
+    }
+    .info-yellow {
+      max-width: 850px;
+      margin: 20px auto 10px;
+      background: #fff9c4;
+      border-left: 6px solid #fbc02d;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 600;
+      color: #5d4037;
+      box-shadow: 0 2px 8px rgb(251 192 45 / 0.3);
+      user-select: text;
+      line-height: 1.4;
+    }
+    .info-blue {
+      max-width: 850px;
+      margin: 0 auto 30px;
+      background: #e3f2fd;
+      border-left: 6px solid #42a5f5;
+      padding: 15px 20px;
+      border-radius: 8px;
+      font-size: 15px;
+      color: #0d47a1;
+      line-height: 1.5;
+      box-shadow: 0 3px 10px rgb(66 165 245 / 0.25);
+      user-select: text;
+    }
+    .registers {
+      display: flex;
+      justify-content: center;
+      gap: 25px;
+      margin: 20px 0 35px;
+      font-family: monospace;
+      font-size: 18px;
+      user-select: text;
+    }
+    .reg-box {
+      background: #e3f2fd;
+      border: 2px solid #64b5f6;
+      padding: 12px 18px;
+      border-radius: 8px;
+      min-width: 130px;
+      text-align: center;
+      box-shadow: 0 3px 8px rgba(33,150,243,0.25);
+      transition: background-color 0.3s ease;
+      position: relative;
+    }
+    .reg-label {
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: #0d47a1;
+      font-size: 20px;
+    }
+    .reg-value {
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 20px;
+      user-select: text;
+      letter-spacing: 1.3px;
+    }
+    .iteration-info {
+      text-align: center;
+      margin-bottom: 30px;
+      font-size: 18px;
+      font-weight: 600;
+      color: #424242;
+    }
+    .iteration-detail {
+      max-width: 850px;
+      margin: 0 auto 40px;
+      background: #e1f5fe;
+      border-radius: 10px;
+      padding: 18px 30px;
+      box-shadow: 0 4px 10px rgba(0, 150, 255, 0.15);
+      font-family: monospace;
+      font-size: 17px;
+      color: #01579b;
+      line-height: 1.5;
+      user-select: text;
+    }
+    .iteration-detail span {
+      font-weight: 700;
+      color: #0277bd;
+    }
+    .controls {
+      text-align: center;
+      margin-bottom: 25px;
+      user-select: none;
+    }
+    .speed-select {
+      margin-left: 15px;
+      font-size: 15px;
+      padding: 5px 12px;
+      border-radius: 5px;
+      border: 1px solid #aaa;
+      cursor: pointer;
+      user-select: none;
+    }
+    .progress-bar {
+      background: #e0e0e0;
+      height: 16px;
+      width: 100%;
+      border-radius: 10px;
+      overflow: hidden;
+      max-width: 850px;
+      margin: 0 auto 40px;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.12);
+    }
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: #42a5f5;
+      transition: width 0.3s ease;
+    }
+    .footer-note {
+      max-width: 850px;
+      margin: 0 auto;
+      font-size: 14px;
+      color: #555;
+      text-align: center;
+      user-select: none;
+    }
+    .final-digest {
+      max-width: 850px;
+      margin: 30px auto;
+      padding: 20px;
+      background: #e8f5e9;
+      border-left: 6px solid #4caf50;
+      border-radius: 8px;
+      text-align: center;
+      font-family: monospace;
+      font-size: 18px;
+      box-shadow: 0 4px 10px rgba(76, 175, 80, 0.2);
+    }
+    .digest-value {
+      font-weight: bold;
+      color: #2e7d32;
+      font-size: 20px;
+      margin: 15px 0;
+      word-break: break-all;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .fade-in {
+      animation: fadeIn 0.5s ease forwards;
+    }
+    .buffer-update {
+      max-width: 850px;
+      margin: 20px auto;
+      padding: 15px;
+      background: #fff3e0;
+      border-left: 6px solid #ffa000;
+      border-radius: 8px;
+      font-family: monospace;
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="nav-top">
+  <a id="step7link" class="btn" href="#">⬅ Шаг 7</a>
+  <a href="index.html" class="btn">🏠 Главная</a>
+  <button id="step9btn" class="btn btn-final" disabled style="opacity:0.5; pointer-events:none;">Шаг 9 ➡</button>
+</div>
+
+<div class="container">
+  <h2>🛠 Шаг 8 — Обработка последнего блока Yq</h2>
+
+  <div class="info-yellow">
+    Исходное сообщение: '<span id="originalText">crypto</span>'<br />
+    Длина блока для обработки: 512 бит<br />
+    Обрабатываемый блок: Y<sub>q</sub> (последний)
+  </div>
+
+  <div class="info-blue">
+    <strong>Теория: что происходит на этом шаге?</strong><br />
+    Это финальный этап обработки блоков. После выполнения 64 итераций для последнего блока Y<sub>q</sub>,<br />
+    мы получим итоговое состояние буфера (CV<sub>q</sub>), которое преобразуется в 128-битный хеш на шаге 9.
+  </div>
+
+  <div class="registers" aria-label="Значения регистров MD5">
+    <div class="reg-box" id="regA"><div class="reg-label">A</div><div class="reg-value">0x67452301</div></div>
+    <div class="reg-box" id="regB"><div class="reg-label">B</div><div class="reg-value">0xefcdab89</div></div>
+    <div class="reg-box" id="regC"><div class="reg-label">C</div><div class="reg-value">0x98badcfe</div></div>
+    <div class="reg-box" id="regD"><div class="reg-label">D</div><div class="reg-value">0x10325476</div></div>
+  </div>
+
+  <div class="iteration-info" id="iterationInfo">
+    Итерация: <span id="iterNumber">0</span> / 64
+    &nbsp;&nbsp;|&nbsp;&nbsp;
+    Раунд: <span id="roundName">-</span>
+  </div>
+
+  <div class="iteration-detail" id="iterationDetail" aria-live="polite" aria-atomic="true">
+    Нажмите "Вперёд", чтобы начать обработку последнего блока.
+  </div>
+
+  <div id="bufferUpdateContainer" style="display: none;">
+    <div class="buffer-update fade-in">
+      <div>🔄 Обновление буфера после обработки блока:</div>
+      <div id="bufferUpdateText"></div>
+    </div>
+  </div>
+
+  <div class="controls" role="region" aria-label="Управление шагами анимации">
+    <button class="btn" id="prevBtn" disabled>⬅ Назад</button>
+    <button class="btn" id="nextBtn">Вперёд ➡</button>
+    <button class="btn" id="autoBtn">▶ Авто</button>
+    <button class="btn" id="resetBtn" style="background:#d32f2f;">⟲ Сброс</button>
+
+    <label for="speedSelect" style="margin-left: 15px; font-weight: 600; color:#1976d2;">Скорость:</label>
+    <select id="speedSelect" class="speed-select" aria-label="Выбор скорости анимации">
+      <option value="slow">Медленно</option>
+      <option value="medium" selected>Средне</option>
+      <option value="fast">Быстро</option>
+      <option value="instant">Мгновенно</option>
+    </select>
+  </div>
+
+  <div class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="64" aria-valuenow="0" aria-label="Прогресс обработки блока">
+    <div class="progress-fill" id="progressFill"></div>
+  </div>
+
+  <div class="footer-note">
+    После завершения обработки нажмите "Шаг 9" для получения финального 128-битного хеша.
+  </div>
+</div>
+
+<script>
+  // Получаем параметры из URL
+  const params = new URLSearchParams(window.location.search);
+  const text = params.get("text") || "crypto";
+  const data = params.get("data") || "01100011011100100111100101110000011101000110111110000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000011000000000000000000000000000000000000000000000000000000000000";
+
+  // Инициализируем регистры из параметров или стандартными значениями
+  const INIT_A = parseInt(params.get("cvA")) || 0x67452301;
+  const INIT_B = parseInt(params.get("cvB")) || 0xefcdab89;
+  const INIT_C = parseInt(params.get("cvC")) || 0x98badcfe;
+  const INIT_D = parseInt(params.get("cvD")) || 0x10325476;
+
+  // Устанавливаем исходное сообщение
+  document.getElementById('originalText').textContent = text;
+
+  // Константы алгоритма MD5
+  const K = [
+    0xd76aa478, 0xe8c7b756, 0x242070db, 0xc1bdceee,
+    0xf57c0faf, 0x4787c62a, 0xa8304613, 0xfd469501,
+    0x698098d8, 0x8b44f7af, 0xffff5bb1, 0x895cd7be,
+    0x6b901122, 0xfd987193, 0xa679438e, 0x49b40821,
+    0xf61e2562, 0xc040b340, 0x265e5a51, 0xe9b6c7aa,
+    0xd62f105d, 0x02441453, 0xd8a1e681, 0xe7d3fbc8,
+    0x21e1cde6, 0xc33707d6, 0xf4d50d87, 0x455a14ed,
+    0xa9e3e905, 0xfcefa3f8, 0x676f02d9, 0x8d2a4c8a,
+    0xfffa3942, 0x8771f681, 0x6d9d6122, 0xfde5380c,
+    0xa4beea44, 0x4bdecfa9, 0xf6bb4b60, 0xbebfbc70,
+    0x289b7ec6, 0xeaa127fa, 0xd4ef3085, 0x04881d05,
+    0xd9d4d039, 0xe6db99e5, 0x1fa27cf8, 0xc4ac5665,
+    0xf4292244, 0x432aff97, 0xab9423a7, 0xfc93a039,
+    0x655b59c3, 0x8f0ccc92, 0xffeff47d, 0x85845dd1,
+    0x6fa87e4f, 0xfe2ce6e0, 0xa3014314, 0x4e0811a1,
+    0xf7537e82, 0xbd3af235, 0x2ad7d2bb, 0xeb86d391
+  ];
+
+  const S = [
+    7, 12, 17, 22, 7, 12, 17, 22, 7, 12, 17, 22, 7, 12, 17, 22,
+    5, 9, 14, 20, 5, 9, 14, 20, 5, 9, 14, 20, 5, 9, 14, 20,
+    4, 11, 16, 23, 4, 11, 16, 23, 4, 11, 16, 23, 4, 11, 16, 23,
+    6, 10, 15, 21, 6, 10, 15, 21, 6, 10, 15, 21, 6, 10, 15, 21
+  ];
+
+  // Подготавливаем блок сообщения
+  const M = [];
+  for (let i = 0; i < 512; i += 32) {
+    const wordBits = data.slice(i, i + 32);
+    const bytes = [
+      wordBits.slice(0, 8),
+      wordBits.slice(8, 16),
+      wordBits.slice(16, 24),
+      wordBits.slice(24, 32)
+    ];
+    const littleEndianWord = bytes.reverse().join('');
+    M.push(parseInt(littleEndianWord, 2));
+  }
+
+
+  // Текущие значения регистров
+  let A = INIT_A, B = INIT_B, C = INIT_C, D = INIT_D;
+
+  // Получаем элементы DOM
+  const regValuesElems = {
+    A: document.querySelector('#regA .reg-value'),
+    B: document.querySelector('#regB .reg-value'),
+    C: document.querySelector('#regC .reg-value'),
+    D: document.querySelector('#regD .reg-value')
+  };
+  const iterNumberElem = document.getElementById('iterNumber');
+  const roundNameElem = document.getElementById('roundName');
+  const iterationDetailElem = document.getElementById('iterationDetail');
+  const progressFill = document.getElementById('progressFill');
+  const step9btn = document.getElementById('step9btn');
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  const autoBtn = document.getElementById('autoBtn');
+  const resetBtn = document.getElementById('resetBtn');
+  const speedSelect = document.getElementById('speedSelect');
+  const bufferUpdateContainer = document.getElementById('bufferUpdateContainer');
+  const bufferUpdateText = document.getElementById('bufferUpdateText');
+
+  let currentStep = 0;
+  let autoPlayId = null;
+  let digest = '';
+  const history = [];
+
+  // Вспомогательные функции
+  function toHex(num) {
+    return (num >>> 0).toString(16).padStart(8, '0');
+  }
+
+  function toLittleEndianHex(value) {
+    return ('00000000' + value.toString(16)).slice(-8).match(/../g).reverse().join('');
+  }
+
+  function getRound(i) {
+    if (i < 16) return 'F';
+    if (i < 32) return 'G';
+    if (i < 48) return 'H';
+    return 'I';
+  }
+
+  function gIndex(i) {
+    if (i < 16) return i;
+    if (i < 32) return (5 * i + 1) % 16;
+    if (i < 48) return (3 * i + 5) % 16;
+    return (7 * i) % 16;
+  }
+
+  // Основные функции MD5
+  function F(x, y, z) { return (x & y) | (~x & z); }
+  function G(x, y, z) { return (x & z) | (y & ~z); }
+  function H(x, y, z) { return x ^ y ^ z; }
+  function I(x, y, z) { return y ^ (x | ~z); }
+
+  function Ffunc(round, b, c, d) {
+    switch (round) {
+      case 'F': return F(b, c, d);
+      case 'G': return G(b, c, d);
+      case 'H': return H(b, c, d);
+      case 'I': return I(b, c, d);
+    }
+  }
+
+  function leftRotate(x, c) {
+    return (x << c) | (x >>> (32 - c));
+  }
+
+  function md5Step(i, AA, BB, CC, DD) {
+    const round = getRound(i);
+    const g = gIndex(i);
+    const Fval = Ffunc(round, BB, CC, DD);
+    const s = S[i];
+    const Kval = K[i];
+    const Mval = M[g];
+    const sum = (AA + Fval + Mval + Kval) >>> 0;
+    const rotated = leftRotate(sum, s) >>> 0;
+    return {
+      round, g, Fval, Kval, Mval, s, sum, rotated
+    };
+  }
+
+  // Функции обновления интерфейса
+  function updateRegisters() {
+    regValuesElems.A.textContent = "0x" + toHex(A);
+    regValuesElems.B.textContent = "0x" + toHex(B);
+    regValuesElems.C.textContent = "0x" + toHex(C);
+    regValuesElems.D.textContent = "0x" + toHex(D);
+  }
+
+  function updateUI(stepData) {
+    iterNumberElem.textContent = currentStep;
+    roundNameElem.textContent = stepData.round;
+
+    iterationDetailElem.innerHTML = `
+      <strong>Итерация ${currentStep}:</strong> (Раунд ${stepData.round})<br>
+      F = (B ${stepData.round === 'F' ? 'AND' : stepData.round === 'G' ? 'AND' : stepData.round === 'H' ? 'XOR' : 'OR'} 
+           C ${stepData.round === 'F' ? 'OR' : stepData.round === 'G' ? 'AND' : stepData.round === 'H' ? 'XOR' : 'XOR'} 
+           D) = 0x${toHex(stepData.Fval)}<br>
+      Сумма: A + F + M[${stepData.g}] + K[${currentStep-1}] = 0x${toHex(stepData.sum)}<br>
+      Циклический сдвиг влево на ${stepData.s}: 0x${toHex(stepData.rotated)}<br>
+      Новое значение B: B + сдвиг = 0x${toHex(B)}
+    `;
+
+    progressFill.style.width = `${(currentStep / 64) * 100}%`;
+
+    if (currentStep === 64) {
+      nextBtn.disabled = true;
+      autoBtn.disabled = true;
+      step9btn.disabled = false;
+      step9btn.style.opacity = "1";
+      step9btn.style.pointerEvents = "auto";
+      showBufferUpdate();
+      digest = toLittleEndianHex((INIT_A + A) >>> 0) + 
+               toLittleEndianHex((INIT_B + B) >>> 0) + 
+               toLittleEndianHex((INIT_C + C) >>> 0) + 
+               toLittleEndianHex((INIT_D + D) >>> 0);
+    }
+  }
+
+  function showBufferUpdate() {
+    const AA = (INIT_A + A) >>> 0;
+    const BB = (INIT_B + B) >>> 0;
+    const CC = (INIT_C + C) >>> 0;
+    const DD = (INIT_D + D) >>> 0;
+
+    bufferUpdateText.innerHTML = `
+      <strong>Обновление буфера:</strong><br>
+      A = A<sub>init</sub> + A<sub>current</sub> = 0x${toHex(INIT_A)} + 0x${toHex(A)} = 0x${toHex(AA)}<br>
+      B = B<sub>init</sub> + B<sub>current</sub> = 0x${toHex(INIT_B)} + 0x${toHex(B)} = 0x${toHex(BB)}<br>
+      C = C<sub>init</sub> + C<sub>current</sub> = 0x${toHex(INIT_C)} + 0x${toHex(C)} = 0x${toHex(CC)}<br>
+      D = D<sub>init</sub> + D<sub>current</sub> = 0x${toHex(INIT_D)} + 0x${toHex(D)} = 0x${toHex(DD)}
+    `;
+    bufferUpdateContainer.style.display = "block";
+  }
+
+  // Управление шагами
+  function nextStep() {
+    if (currentStep >= 64) return;
+
+    // Сохраняем состояние перед шагом
+    history.push({A, B, C, D});
+
+    // Получаем данные для текущей итерации
+    const stepData = md5Step(currentStep, A, B, C, D);
+    
+    // Сохраняем текущие значения регистров
+    const AA = A, BB = B, CC = C, DD = D;
+    
+    // Правильное обновление регистров согласно спецификации MD5:
+    A = D;
+    B = (BB + leftRotate((AA + stepData.Fval + stepData.Mval + stepData.Kval) >>> 0, stepData.s)) >>> 0;
+    C = BB;
+    D = CC;
+
+    currentStep++;
+
+    updateRegisters();
+    updateUI(stepData);
+    prevBtn.disabled = false;
+
+    if (currentStep === 64) {
+      showBufferUpdate();
+    }
+  }
+
+  function prevStep() {
+    if (currentStep <= 0) return;
+
+    currentStep--;
+    const prevState = history.pop();
+
+    A = prevState.A;
+    B = prevState.B;
+    C = prevState.C;
+    D = prevState.D;
+
+    updateRegisters();
+
+    if (currentStep > 0) {
+      const stepData = md5Step(currentStep-1, A, B, C, D);
+      updateUI(stepData);
+    } else {
+      iterationDetailElem.textContent = "Нажмите 'Вперёд', чтобы начать обработку последнего блока.";
+      iterNumberElem.textContent = "0";
+      roundNameElem.textContent = "-";
+    }
+
+    progressFill.style.width = `${(currentStep / 64) * 100}%`;
+
+    nextBtn.disabled = false;
+    autoBtn.disabled = false;
+    step9btn.disabled = true;
+    step9btn.style.opacity = "0.5";
+    step9btn.style.pointerEvents = "none";
+    bufferUpdateContainer.style.display = "none";
+  }
+
+  function autoPlay() {
+    if (autoPlayId) {
+      clearInterval(autoPlayId);
+      autoPlayId = null;
+      autoBtn.textContent = "▶ Авто";
+      return;
+    }
+
+    autoBtn.textContent = "❚❚ Пауза";
+    const speed = speedSelect.value;
+    const delay = {
+      slow: 1000,
+      medium: 500,
+      fast: 200,
+      instant: 0
+    }[speed];
+
+    autoPlayId = setInterval(() => {
+      if (currentStep >= 64) {
+        clearInterval(autoPlayId);
+        autoPlayId = null;
+        autoBtn.textContent = "▶ Авто";
+        return;
+      }
+      nextStep();
+    }, delay);
+  }
+
+  function reset() {
+    if (autoPlayId) {
+      clearInterval(autoPlayId);
+      autoPlayId = null;
+      autoBtn.textContent = "▶ Авто";
+    }
+
+    currentStep = 0;
+    A = INIT_A;
+    B = INIT_B;
+    C = INIT_C;
+    D = INIT_D;
+    history.length = 0;
+
+    updateRegisters();
+    iterNumberElem.textContent = "0";
+    roundNameElem.textContent = "-";
+    iterationDetailElem.textContent = "Нажмите 'Вперёд', чтобы начать обработку последнего блока.";
+    progressFill.style.width = "0%";
+    prevBtn.disabled = true;
+    nextBtn.disabled = false;
+    autoBtn.disabled = false;
+    step9btn.disabled = true;
+    step9btn.style.opacity = "0.5";
+    step9btn.style.pointerEvents = "none";
+    bufferUpdateContainer.style.display = "none";
+  }
+
+  // Навигация
+  document.getElementById('step7link').href = `step7.html?text=${encodeURIComponent(text)}&data=${encodeURIComponent(data)}`;
+  step9btn.onclick = () => {
+    window.location.href = `step9.html?text=${encodeURIComponent(text)}&digest=${digest}`;
+  };
+
+  // Обработчики событий
+  nextBtn.addEventListener('click', nextStep);
+  prevBtn.addEventListener('click', prevStep);
+  autoBtn.addEventListener('click', autoPlay);
+  resetBtn.addEventListener('click', reset);
+
+  // Инициализация
+  prevBtn.disabled = true;
+  updateRegisters();
+</script>
+</body>
+</html>

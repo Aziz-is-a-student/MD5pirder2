@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Шаг 2 — Padding | MD5pider</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: #f4f6f8;
+      color: #333;
+      padding: 80px 20px 20px;
+    }
+    .padding-explanation {
+      background: #e3f2fd;
+      border-left: 6px solid #42a5f5;
+      padding: 20px;
+      border-radius: 10px;
+      margin-bottom: 30px;
+    }
+    .padding-explanation h2, .padding-explanation h3 {
+      margin-top: 10px;
+      color: #1976d2;
+    }
+    .padding-explanation p, .padding-explanation ul {
+      font-size: 16px;
+      line-height: 1.6;
+    }
+    .padding-explanation code {
+      background: #bbdefb;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: monospace;
+    }
+    .nav-top {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: #ffffff;
+      padding: 10px 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 1000;
+      gap: 10px;
+    }
+    .btn {
+      padding: 10px 16px;
+      background: #1976d2;
+      color: white;
+      text-decoration: none;
+      border-radius: 6px;
+      font-weight: bold;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      border: none;
+      font-size: 14px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 80px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      white-space: nowrap;
+    }
+    .btn:hover {
+      background: #0d47a1;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    }
+    .btn:active {
+      transform: translateY(0);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .btn-reset {
+      background: #d32f2f;
+    }
+    .btn-reset:hover {
+      background: #b71c1c;
+    }
+    header {
+      text-align: center;
+      margin-bottom: 30px;
+      font-size: 24px;
+      color: #4e89ae;
+    }
+    .container {
+      max-width: 1000px;
+      margin: auto;
+      padding: 20px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    .bit-square {
+      display: inline-block;
+      padding: 6px 8px;
+      margin: 2px 1px;
+      border-radius: 4px;
+      font-family: monospace;
+    }
+    .bit-original { background-color: #bbdefb; border: 1px solid #64b5f6; }
+    .bit-padding  { background-color: #c8e6c9; border: 1px solid #81c784; }
+    .bit-wrapper {
+      text-align: center;
+      margin-top: 20px;
+      line-height: 2.2;
+      word-break: break-word;
+    }
+    .bit-section-title {
+      font-weight: bold;
+      margin-top: 20px;
+      text-align: center;
+      color: #555;
+    }
+    .progress-bar {
+      width: 100%;
+      background: #e0e0e0;
+      border-radius: 10px;
+      overflow: hidden;
+      margin-top: 10px;
+      height: 20px;
+    }
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: #4caf50;
+      transition: width 0.3s;
+    }
+    .final-section {
+      display: none;
+      text-align: center;
+      margin-top: 30px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      background: #f9fbe7;
+    }
+    table td, table th {
+      border: 1px solid #cddc39;
+      padding: 10px;
+      text-align: center;
+    }
+    .center {
+      text-align: center;
+      margin: 20px 0;
+    }
+    .nav-steps {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: flex-end;
+    }
+    .speed-controls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 10px;
+      justify-content: center;
+    }
+    .speed-btn {
+      padding: 6px 12px;
+      background: #e0e0e0;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .speed-btn.active {
+      background: #1976d2;
+      color: white;
+    }
+    @media (max-width: 600px) {
+      .nav-top {
+        padding: 8px 10px;
+      }
+      .btn {
+        padding: 8px 12px;
+        font-size: 13px;
+        min-width: 70px;
+      }
+      body {
+        padding-top: 70px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="nav-top">
+  <a href="index.html" class="btn">🏠 Главная</a>
+  <div class="nav-steps">
+    <a href="step1.html" class="btn">⬅ Шаг 1</a>
+    <a id="step3Btn" class="btn" style="display: none;">Шаг 3 ➡</a>
+  </div>
+</div>
+
+<header>🧩 Шаг 2 — Padding</header>
+
+<div class="container">
+    <div class="padding-explanation">
+        <h2>📘 Что происходит на этом шаге?</h2>
+        <p>
+          Алгоритм <strong>MD5</strong> работает с блоками по <strong>512 бит</strong>. Поэтому любое сообщение сначала нужно привести к кратной длине.
+        </p>
+        <h3>🧩 Как это делается:</h3>
+        <p>
+          Алгоритм MD5 разбивает всё сообщение на блоки по <strong>512 бит</strong>. Чтобы уложиться в этот размер, мы сначала добавляем к сообщению один бит <code>1</code>, а затем столько нулей <code>0</code>, чтобы вся длина стала ровно <strong>448 бит</strong>.
+        </p>
+        <p>
+          Почему именно <strong>448</strong>? Потому что в конце блока (на следующем шаге) будет добавлено ещё <strong>64 бита</strong>, которые представляют собой длину исходного сообщения. 
+        </p>
+        <p>
+          Итого: <code>448 + 64 = 512</code> — идеально вписывается в размер одного блока.
+        </p>
+        <h3>📏 Пример для сообщения "<span id="exampleText"></span>":</h3>
+        <ul>
+          <li>Исходное сообщение: "<span id="messageExample"></span>" (<span id="charCount">0</span> символов)</li>
+          <li>Длина в битах: <span id="charCountBits">0</span> × 8 = <span id="bitCount">0</span> бит</li>
+          <li>Добавляем бит "1": <span id="bitCountPlus1">0</span> + 1 = <span id="bitCountAfter1">0</span> бит</li>
+          <li>Добавляем нули до 448 бит: 448 - <span id="bitsTo448">0</span> = <span id="zerosCount">0</span> нулей</li>
+          <li>Итого: <span id="bitCountFinal">0</span> (сообщение) + 1 (padding) + <span id="zerosCountFinal">0</span> (нули) = 448 бит</li>
+        </ul>
+      </div>
+
+  <div class="bit-section-title">Исходные биты (сообщение "<span id="messageTitle"></span>")</div>
+  <div class="bit-wrapper" id="originalBits"></div>
+
+  <div class="bit-section-title">Добавление Padding</div>
+  <div class="center">
+    <button class="btn" onclick="nextPaddingBit()" id="stepBtn">Следующий бит</button>
+    <button class="btn" onclick="autoFill()" id="autoBtn">Добавить всё автоматически</button>
+    <button class="btn btn-reset" onclick="resetStep2()">🔄 Обнулить</button>
+    <div class="speed-controls">
+      <div>Скорость:</div>
+      <div class="speed-btn active" onclick="setSpeed('slow')">Медленно</div>
+      <div class="speed-btn" onclick="setSpeed('medium')">Средне</div>
+      <div class="speed-btn" onclick="setSpeed('fast')">Быстро</div>
+      <div class="speed-btn" onclick="setSpeed('instant')">Мгновенно</div>
+    </div>
+  </div>
+  <div class="bit-wrapper" id="paddingBits"></div>
+
+  <div class="progress-bar">
+    <div class="progress-fill" id="progressFill"></div>
+  </div>
+
+  <div class="bit-section-title">📊 Таблица сравнения</div>
+  <table>
+    <tr><th>Тип</th><th>Длина (бит)</th><th>Описание</th></tr>
+    <tr><td>Исходное сообщение</td><td id="bitLenCell">—</td><td>Из шага 1</td></tr>
+    <tr><td>Padding</td><td id="padLenCell">—</td><td>Дополнение до 448 бит</td></tr>
+    <tr><td><strong>Итог</strong></td><td id="totalLenCell">—</td><td>До длины (шаг 3)</td></tr>
+  </table>
+
+  <div class="final-section" id="finalSection">
+    <div class="bit-section-title">🎯 Финальный результат (448 бит)</div>
+    <div class="bit-wrapper" id="finalBits"></div>
+  </div>
+</div>
+
+<script>
+  // Получаем текст из параметра URL или используем "crypto" по умолчанию
+  const params = new URLSearchParams(window.location.search);
+  const text = params.get("text") ? decodeURIComponent(params.get("text")) : "crypto";
+  
+  // Обновляем текст в интерфейсе
+  document.getElementById("exampleText").textContent = text;
+  document.getElementById("messageExample").textContent = text;
+  document.getElementById("messageTitle").textContent = text;
+  
+  const originalBitsDiv = document.getElementById("originalBits");
+  const paddingBitsDiv = document.getElementById("paddingBits");
+  const finalBitsDiv = document.getElementById("finalBits");
+  const progressFill = document.getElementById("progressFill");
+  const stepBtn = document.getElementById("stepBtn");
+  const autoBtn = document.getElementById("autoBtn");
+  const step3Btn = document.getElementById("step3Btn");
+  const finalSection = document.getElementById("finalSection");
+
+  const bitLenCell = document.getElementById("bitLenCell");
+  const padLenCell = document.getElementById("padLenCell");
+  const totalLenCell = document.getElementById("totalLenCell");
+
+  // Преобразуем текст в биты (результат шага 1)
+  const originalBits = text.split('').map(c => c.charCodeAt(0).toString(2).padStart(8, '0')).join('').split('');
+  
+  // Обновляем информацию о длине сообщения
+  const charCount = text.length;
+  const bitCount = charCount * 8;
+  const zerosCount = 448 - (bitCount + 1);
+  
+  document.getElementById("charCount").textContent = charCount;
+  document.getElementById("charCountBits").textContent = charCount;
+  document.getElementById("bitCount").textContent = bitCount;
+  document.getElementById("bitCountPlus1").textContent = bitCount;
+  document.getElementById("bitCountAfter1").textContent = bitCount + 1;
+  document.getElementById("bitsTo448").textContent = bitCount + 1;
+  document.getElementById("zerosCount").textContent = zerosCount;
+  document.getElementById("bitCountFinal").textContent = bitCount;
+  document.getElementById("zerosCountFinal").textContent = zerosCount;
+  
+  bitLenCell.textContent = originalBits.length;
+
+  // Создаем padding (1 + нули до 448 бит)
+  let paddingBits = ["1"];
+  while ((originalBits.length + paddingBits.length) % 512 !== 448) {
+    paddingBits.push("0");
+  }
+
+  let paddingIndex = 0;
+  let isAutoFilling = false;
+  let autoFillTimeout = null;
+  let allBits = [...originalBits];
+  let currentSpeed = 'medium';
+
+  function setSpeed(speed) {
+    currentSpeed = speed;
+    document.querySelectorAll('.speed-btn').forEach(btn => {
+      btn.classList.remove('active');
+    });
+    event.target.classList.add('active');
+  }
+
+  function getSpeedDelay() {
+    switch(currentSpeed) {
+      case 'slow': return 300;
+      case 'medium': return 100;
+      case 'fast': return 30;
+      case 'instant': return 0;
+      default: return 100;
+    }
+  }
+
+  function renderOriginalBits() {
+    originalBitsDiv.innerHTML = "";
+    originalBits.forEach((bit, i) => {
+      const span = document.createElement("span");
+      span.className = "bit-square bit-original";
+      span.textContent = bit;
+      originalBitsDiv.appendChild(span);
+      if ((i + 1) % 8 === 0) originalBitsDiv.appendChild(document.createTextNode(" "));
+    });
+  }
+
+  function renderPaddingBit(index) {
+    const bit = paddingBits[index];
+    const span = document.createElement("span");
+    span.className = "bit-square bit-padding";
+    span.textContent = bit;
+    paddingBitsDiv.appendChild(span);
+    if ((originalBits.length + index + 1) % 8 === 0)
+      paddingBitsDiv.appendChild(document.createTextNode(" "));
+    allBits.push(bit);
+    updateTable();
+    const percent = ((paddingIndex + 1) / paddingBits.length) * 100;
+    progressFill.style.width = percent + "%";
+    if (paddingIndex + 1 === paddingBits.length) setTimeout(showFinalResult, 500);
+  }
+
+  function nextPaddingBit() {
+    if (paddingIndex >= paddingBits.length || isAutoFilling) return;
+    renderPaddingBit(paddingIndex++);
+  }
+
+  function autoFill() {
+    if (paddingIndex >= paddingBits.length || isAutoFilling) return;
+    isAutoFilling = true;
+    stepBtn.disabled = true;
+    autoBtn.disabled = true;
+    const delay = getSpeedDelay();
+    
+    function step() {
+      if (paddingIndex >= paddingBits.length || !isAutoFilling) {
+        isAutoFilling = false;
+        return;
+      }
+      renderPaddingBit(paddingIndex++);
+      if (delay > 0) {
+        autoFillTimeout = setTimeout(step, delay);
+      } else {
+        while (paddingIndex < paddingBits.length && isAutoFilling) {
+          renderPaddingBit(paddingIndex++);
+        }
+        isAutoFilling = false;
+      }
+    }
+    step();
+  }
+
+  function showFinalResult() {
+    finalSection.style.display = "block";
+    finalBitsDiv.innerHTML = "";
+    allBits.forEach((bit, i) => {
+      const span = document.createElement("span");
+      span.className = "bit-square " + (i < originalBits.length ? "bit-original" : "bit-padding");
+      span.textContent = bit;
+      finalBitsDiv.appendChild(span);
+      if ((i + 1) % 8 === 0) finalBitsDiv.appendChild(document.createTextNode(" "));
+    });
+    step3Btn.href = `step3.html?data=${allBits.join('')}&len=${originalBits.length}&text=${encodeURIComponent(text)}`;
+    step3Btn.style.display = "inline-block";
+  }
+
+  function updateTable() {
+    padLenCell.textContent = paddingIndex;
+    totalLenCell.textContent = originalBits.length + paddingIndex;
+  }
+
+  function resetStep2() {
+    // Останавливаем автоматическое добавление
+    isAutoFilling = false;
+    if (autoFillTimeout) {
+      clearTimeout(autoFillTimeout);
+      autoFillTimeout = null;
+    }
+    
+    // Сбрасываем состояние
+    paddingIndex = 0;
+    allBits = [...originalBits];
+    paddingBitsDiv.innerHTML = "";
+    finalBitsDiv.innerHTML = "";
+    progressFill.style.width = "0%";
+    padLenCell.textContent = "—";
+    totalLenCell.textContent = "—";
+    finalSection.style.display = "none";
+    step3Btn.style.display = "none";
+    stepBtn.disabled = false;
+    autoBtn.disabled = false;
+  }
+
+  // Автоматически выполняем шаг 1 (преобразование текста в биты)
+  renderOriginalBits();
+</script>
+
+</body>
+</html>

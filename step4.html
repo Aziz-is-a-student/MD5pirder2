@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Шаг 4 — Разделение на блоки | MD5pider</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f4f6f8;
+      color: #333;
+      padding: 80px 20px 20px;
+      margin: 0;
+    }
+    .nav-top {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: #fff;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      padding: 10px 20px;
+      display: flex;
+      justify-content: space-between;
+      z-index: 1000;
+    }
+    .btn {
+      padding: 10px 16px;
+      background: #1976d2;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-weight: bold;
+      font-size: 14px;
+      cursor: pointer;
+      margin-left: 10px;
+      text-decoration: none;
+    }
+    .btn:hover {
+      background: #0d47a1;
+    }
+    .container {
+      max-width: 1000px;
+      margin: auto;
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    .info-box, .theory-box, .next-box {
+      background: #fffde7;
+      padding: 14px 18px;
+      border-left: 6px solid #fdd835;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      font-size: 15px;
+    }
+    .theory-box {
+      background: #e3f2fd;
+      border-left-color: #2196f3;
+    }
+    .next-box {
+      background: #ede7f6;
+      border-left-color: #7e57c2;
+    }
+    .block-title {
+      font-size: 18px;
+      font-weight: bold;
+      margin-top: 20px;
+      margin-bottom: 5px;
+      color: #1976d2;
+    }
+    .bit-block {
+      font-family: monospace;
+      background: #f5f5f5;
+      border-left: 6px solid #90caf9;
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      white-space: pre-wrap;
+      word-break: break-word;
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeIn 0.5s ease forwards;
+    }
+    .byte {
+      display: inline-block;
+      margin: 2px;
+      font-weight: bold;
+      position: relative;
+    }
+    .bit {
+      display: inline-block;
+      width: 22px;
+      height: 22px;
+      line-height: 22px;
+      text-align: center;
+      border: 1px solid #90caf9;
+      border-radius: 4px;
+      margin: 1px;
+      background: #fff;
+      font-weight: bold;
+    }
+    .bit-0 {
+      background: #ffcdd2;
+    }
+    .bit-1 {
+      background: #c8e6c9;
+    }
+    .byte-separator {
+      display: inline-block;
+      width: 8px;
+      height: 100%;
+      position: relative;
+    }
+    .byte-separator::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      right: 3px;
+      width: 2px;
+      background: #2196f3;
+    }
+    .byte-row {
+      margin-bottom: 10px;
+    }
+    ul {
+      margin-top: 10px;
+      margin-bottom: 0;
+    }
+    @keyframes fadeIn {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    @keyframes fadeInSlide {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    #mathSection.animated {
+      animation: fadeInSlide 0.5s ease forwards;
+    }
+    .legend {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin: 15px 0;
+      flex-wrap: wrap;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 14px;
+    }
+    .legend-color {
+      width: 20px;
+      height: 20px;
+      border-radius: 4px;
+      border: 1px solid #90caf9;
+    }
+  </style>
+</head>
+<body>
+
+<div class="nav-top">
+  <a href="index.html" class="btn">🏠 Главная</a>
+  <a href="step3.html" class="btn">⬅ Шаг 3</a>
+  <a id="nextStepBtn" class="btn">Шаг 5 ➡</a>
+</div>
+
+<div class="container">
+  <h2>🧱 Шаг 4 — Разделение на блоки по 512 бит</h2>
+
+  <div id="messageInfo" class="info-box"></div>
+
+  <div class="theory-box">
+    <h3>📘 Теория: что такое блоки Y0, Y1, ...?</h3>
+    <p>
+      Алгоритм <strong>MD5</strong> работает с блоками по <strong>512 бит</strong>, то есть <strong>64 байта</strong>.
+      После добавления padding и длины сообщение разбивается на такие блоки, которые называются:
+      <code>Y0, Y1, ..., Yq</code>.
+    </p>
+    <ul>
+      <li>В каждый блок входит 448 бит сообщения + 64 бита длины</li>
+      <li>Если данных много, появляются Y1, Y2 и т.д.</li>
+    </ul>
+  </div>
+
+  <div class="legend">
+    <div class="legend-item">
+      <div class="legend-color" style="background: #ffcdd2;"></div>
+      <span>Бит '0'</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-color" style="background: #c8e6c9;"></div>
+      <span>Бит '1'</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-color" style="background: white;"></div>
+      <span>Коробка для бита</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-color" style="background: #2196f3; width: 2px;"></div>
+      <span>Разделитель байтов</span>
+    </div>
+  </div>
+
+  <div id="blocksContainer"></div>
+
+  <div style="text-align: center; margin-top: 20px;">
+    <button class="btn" onclick="toggleMath()">📊 Показать расчёты</button>
+  </div>
+
+  <div id="mathSection" style="display: none; margin-top: 20px;">
+    <div style="background: #e3f2fd; border-left: 6px solid #42a5f5; padding: 15px; border-radius: 8px;">
+      <h3>📐 Расчёт итоговой длины</h3>
+      <ul style="font-size: 16px; line-height: 1.6;">
+        <li>Длина исходного сообщения: <strong id="calc-msg-bits"></strong> бит</li>
+        <li>Добавлен 1 бит «1»</li>
+        <li>Padding (нули): <strong id="calc-pad-bits"></strong> бит</li>
+        <li>Добавлены 64 бита длины</li>
+        <li><strong>Итого: <span id="calc-total-bits"></span> бит = 512 бит ✅</strong></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="next-box">
+    <h3>📍 Что будет дальше?</h3>
+    <p>На следующем шаге мы инициализируем 4 регистра (A, B, C, D), с которыми начнётся хеширование.</p>
+    <p>Каждый блок Y<sub>i</sub> поочерёдно будет обрабатываться функцией <code>HxMD5(Y<sub>i</sub>)</code>, начиная с Y0.</p>
+    <p>Подготовленные блоки прямо сейчас готовы к обработке на шаге 6!</p>
+  </div>
+</div>
+
+<script>
+  const params = new URLSearchParams(window.location.search);
+  let text = params.get("text") || "crypto";
+  let data = params.get("data");
+
+  if (!data || !/^[01]+$/.test(data)) {
+    const utf8Bytes = Array.from(new TextEncoder().encode(text));
+    const originalBits = utf8Bytes.map(b => b.toString(2).padStart(8, '0')).join('').split('');
+
+    const originalLength = originalBits.length;
+    let pad = ['1'];
+    while ((originalLength + pad.length) % 512 !== 448) pad.push('0');
+    const totalBits = [...originalBits, ...pad];
+    const len64 = (originalLength).toString(2).padStart(64, '0');
+    const lenLE = len64.match(/.{8}/g).reverse().join('');
+    const lengthBits = lenLE.split('');
+    data = [...totalBits, ...lengthBits].join('');
+  }
+
+  const bitCount = data.length;
+  const blocks = [];
+  for (let i = 0; i < bitCount; i += 512) {
+    blocks.push(data.slice(i, i + 512));
+  }
+
+  document.getElementById("messageInfo").innerHTML = `
+    <strong>Исходное сообщение:</strong> "${text}"<br>
+    <strong>Общая длина после padding и добавления длины:</strong> ${bitCount} бит<br>
+    <strong>Количество 512-битных блоков:</strong> ${blocks.length}
+  `;
+
+  const container = document.getElementById("blocksContainer");
+  blocks.forEach((block, index) => {
+    const div = document.createElement("div");
+    div.className = "bit-block";
+    div.style.animationDelay = `${index * 0.2}s`;
+    
+    let html = `<div class="block-title">Блок Y${index}</div>`;
+    
+    const bytes = block.match(/.{8}/g);
+    
+    // Добавляем строки по 8 байтов в каждой
+    for (let row = 0; row < 8; row++) {
+      const start = row * 8;
+      const end = start + 8;
+      const rowBytes = bytes.slice(start, end);
+      
+      html += '<div class="byte-row">';
+      rowBytes.forEach((byte, i) => {
+        // Добавляем каждый бит в отдельный квадрат
+        html += '<span class="byte">';
+        for (let j = 0; j < 8; j++) {
+          const bit = byte[j];
+          html += `<span class="bit bit-${bit}" title="Байт ${start + i}, бит ${j}">${bit}</span>`;
+        }
+        html += '</span>';
+        
+        // Добавляем разделитель после каждого байта (кроме последнего в строке)
+        if (i < 7) {
+          html += '<span class="byte-separator"></span>';
+        }
+      });
+      html += '</div>';
+    }
+    
+    div.innerHTML = html;
+    container.appendChild(div);
+  });
+
+  sessionStorage.setItem("step5data", data);
+  document.getElementById("nextStepBtn").href = `step5.html?text=${encodeURIComponent(text)}&blocks=${blocks.length}`;
+
+  function toggleMath() {
+    const mathBlock = document.getElementById("mathSection");
+    const utf8Length = new TextEncoder().encode(text).length * 8;
+    const padLength = 448 - utf8Length - 1;
+
+    document.getElementById("calc-msg-bits").textContent = utf8Length;
+    document.getElementById("calc-pad-bits").textContent = padLength;
+    document.getElementById("calc-total-bits").textContent = utf8Length + 1 + padLength + 64;
+
+    if (mathBlock.style.display === "none") {
+      mathBlock.style.display = "block";
+      mathBlock.classList.add("animated");
+    } else {
+      mathBlock.classList.remove("animated");
+      mathBlock.style.display = "none";
+    }
+  }
+</script>
+
+</body>
+</html>

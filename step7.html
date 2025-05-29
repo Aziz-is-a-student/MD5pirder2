@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Шаг 7 — Основной цикл MD5: обработка блока Y₁ | MD5pider</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f4f6f8;
+      color: #333;
+      margin: 0;
+      padding: 80px 20px 20px;
+      user-select: none;
+    }
+    .nav-top {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      background: #fff;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      padding: 10px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 1000;
+    }
+    .btn {
+      padding: 10px 16px;
+      background: #1976d2;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      text-decoration: none;
+      user-select: none;
+      min-width: 90px;
+      margin-left: 8px;
+    }
+    .btn:hover:not(:disabled) {
+      background: #0d47a1;
+    }
+    .btn:disabled {
+      background: #90a4ae;
+      cursor: default;
+    }
+    .container {
+      max-width: 1000px;
+      margin: auto;
+      background: white;
+      border-radius: 12px;
+      padding: 30px 40px 40px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+      user-select: text;
+    }
+    h2 {
+      color: #424242; /* чёрный */
+      margin-top: 0;
+      text-align: center;
+    }
+    .info-yellow {
+      max-width: 850px;
+      margin: 20px auto 10px;
+      background: #fff9c4;
+      border-left: 6px solid #fbc02d;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 600;
+      color: #5d4037;
+      box-shadow: 0 2px 8px rgb(251 192 45 / 0.3);
+      user-select: text;
+      line-height: 1.4;
+    }
+    .info-blue {
+      max-width: 850px;
+      margin: 0 auto 30px;
+      background: #e3f2fd;
+      border-left: 6px solid #42a5f5;
+      padding: 15px 20px;
+      border-radius: 8px;
+      font-size: 15px;
+      color: #0d47a1;
+      line-height: 1.5;
+      box-shadow: 0 3px 10px rgb(66 165 245 / 0.25);
+      user-select: text;
+    }
+    .registers {
+      display: flex;
+      justify-content: center;
+      gap: 25px;
+      margin: 20px 0 35px;
+      font-family: monospace;
+      font-size: 18px;
+      user-select: text;
+    }
+    .reg-box {
+      background: #e3f2fd;
+      border: 2px solid #64b5f6;
+      padding: 12px 18px;
+      border-radius: 8px;
+      min-width: 130px;
+      text-align: center;
+      box-shadow: 0 3px 8px rgba(33,150,243,0.25);
+      transition: background-color 0.3s ease;
+      position: relative;
+    }
+    .reg-label {
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: #0d47a1;
+      font-size: 20px;
+    }
+    .reg-value {
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 20px;
+      user-select: text;
+      letter-spacing: 1.3px;
+    }
+    .iteration-info {
+      text-align: center;
+      margin-bottom: 30px;
+      font-size: 18px;
+      font-weight: 600;
+      color: #424242;
+    }
+    .iteration-detail {
+      max-width: 850px;
+      margin: 0 auto 40px;
+      background: #e1f5fe;
+      border-radius: 10px;
+      padding: 18px 30px;
+      box-shadow: 0 4px 10px rgba(0, 150, 255, 0.15);
+      font-family: monospace;
+      font-size: 17px;
+      color: #01579b;
+      line-height: 1.5;
+      user-select: text;
+    }
+    .iteration-detail span {
+      font-weight: 700;
+      color: #0277bd;
+    }
+    .controls {
+      text-align: center;
+      margin-bottom: 25px;
+      user-select: none;
+    }
+    .speed-select {
+      margin-left: 15px;
+      font-size: 15px;
+      padding: 5px 12px;
+      border-radius: 5px;
+      border: 1px solid #aaa;
+      cursor: pointer;
+      user-select: none;
+    }
+    .progress-bar {
+      background: #e0e0e0;
+      height: 16px;
+      width: 100%;
+      border-radius: 10px;
+      overflow: hidden;
+      max-width: 850px;
+      margin: 0 auto 40px;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.12);
+    }
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: #42a5f5;
+      transition: width 0.3s ease;
+    }
+    .footer-note {
+      max-width: 850px;
+      margin: 0 auto;
+      font-size: 14px;
+      color: #555;
+      text-align: center;
+      user-select: none;
+    }
+  </style>
+</head>
+<body>
+
+<div class="nav-top">
+  <a id="step6link" class="btn" href="#">⬅ Шаг 6</a>
+  <a href="index.html" class="btn">🏠 Главная</a>
+  <button id="step8btn" class="btn" disabled style="opacity:0.5; pointer-events:none;">Шаг 8 ➡</button>
+</div>
+
+<div class="container">
+
+  <h2>🛠 Шаг 7 — Основной цикл MD5: обработка блока Y₁</h2>
+
+  <div class="info-yellow">
+    Исходное сообщение: '<span id="originalText">crypto</span>'<br />
+    Длина блока для обработки: 512 бит<br />
+    Обрабатываемый блок: Y₁
+  </div>
+
+  <div class="info-blue">
+    <strong>Теория: что происходит на этом шаге?</strong><br />
+    На этом шаге происходит обработка второго блока сообщения, используя состояние CV1 из предыдущего шага.<br />
+    MD5 выполняет 64 итерации в 4 раундах с функциями F, G, H и I и соответствующими сдвигами.<br />
+    Результатом станет состояние CV2, используемое в следующих шагах.
+  </div>
+
+  <div class="registers" aria-label="Значения регистров MD5">
+    <div class="reg-box" id="regA"><div class="reg-label">A</div><div class="reg-value">0x00000000</div></div>
+    <div class="reg-box" id="regB"><div class="reg-label">B</div><div class="reg-value">0x00000000</div></div>
+    <div class="reg-box" id="regC"><div class="reg-label">C</div><div class="reg-value">0x00000000</div></div>
+    <div class="reg-box" id="regD"><div class="reg-label">D</div><div class="reg-value">0x00000000</div></div>
+  </div>
+
+  <div class="iteration-info" id="iterationInfo">
+    Итерация: <span id="iterNumber">0</span> / 64
+    &nbsp;&nbsp;|&nbsp;&nbsp;
+    Раунд: <span id="roundName">-</span>
+  </div>
+
+  <div class="iteration-detail" id="iterationDetail" aria-live="polite" aria-atomic="true">
+    Нажмите "Вперёд", чтобы начать обработку блока.
+  </div>
+
+  <div class="controls" role="region" aria-label="Управление шагами анимации">
+    <button class="btn" id="prevBtn" disabled>⬅ Назад</button>
+    <button class="btn" id="nextBtn">Вперёд ➡</button>
+    <button class="btn" id="autoBtn">▶ Авто</button>
+    <button class="btn" id="resetBtn" style="background:#d32f2f;">⟲ Сброс</button>
+
+    <label for="speedSelect" style="margin-left: 15px; font-weight: 600; color:#1976d2;">Скорость:</label>
+    <select id="speedSelect" class="speed-select" aria-label="Выбор скорости анимации">
+      <option value="slow">Медленно</option>
+      <option value="medium" selected>Средне</option>
+      <option value="fast">Быстро</option>
+      <option value="instant">Мгновенно</option>
+    </select>
+  </div>
+
+  <div class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="64" aria-valuenow="0" aria-label="Прогресс обработки блока">
+    <div class="progress-fill" id="progressFill"></div>
+  </div>
+
+  <div class="footer-note">
+    Обработка второго блока с учётом состояния CV1 из предыдущего шага.
+  </div>
+</div>
+
+<script>
+    const params = new URLSearchParams(window.location.search);
+    const text = params.get("text") || "crypto";
+    const allData = sessionStorage.getItem("step5data") || "";
+  
+    // CV по умолчанию (если шаг 6 не передал новые)
+    const INIT_A = parseInt(params.get("cvA")) || 0x67452301;
+    const INIT_B = parseInt(params.get("cvB")) || 0xefcdab89;
+    const INIT_C = parseInt(params.get("cvC")) || 0x98badcfe;
+    const INIT_D = parseInt(params.get("cvD")) || 0x10325476;
+  
+    // Если нет второго блока — сразу на шаг 8
+    if (allData.length < 1024) {
+      const url = `step8.html?text=${encodeURIComponent(text)}&data=${encodeURIComponent(allData)}&cvA=${INIT_A}&cvB=${INIT_B}&cvC=${INIT_C}&cvD=${INIT_D}`;
+      window.location.href = url;
+    }
+  
+    // Берём блок Y₁ (второй 512-битный)
+    const data = allData.slice(512, 1024).padEnd(512, '0');
+  
+    document.getElementById('originalText').textContent = text;
+  
+
+  const K = [
+    0xd76aa478,0xe8c7b756,0x242070db,0xc1bdceee,
+    0xf57c0faf,0x4787c62a,0xa8304613,0xfd469501,
+    0x698098d8,0x8b44f7af,0xffff5bb1,0x895cd7be,
+    0x6b901122,0xfd987193,0xa679438e,0x49b40821,
+    0xf61e2562,0xc040b340,0x265e5a51,0xe9b6c7aa,
+    0xd62f105d,0x02441453,0xd8a1e681,0xe7d3fbc8,
+    0x21e1cde6,0xc33707d6,0xf4d50d87,0x455a14ed,
+    0xa9e3e905,0xfcefa3f8,0x676f02d9,0x8d2a4c8a,
+    0xfffa3942,0x8771f681,0x6d9d6122,0xfde5380c,
+    0xa4beea44,0x4bdecfa9,0xf6bb4b60,0xbebfbc70,
+    0x289b7ec6,0xeaa127fa,0xd4ef3085,0x04881d05,
+    0xd9d4d039,0xe6db99e5,0x1fa27cf8,0xc4ac5665,
+    0xf4292244,0x432aff97,0xab9423a7,0xfc93a039,
+    0x655b59c3,0x8f0ccc92,0xffeff47d,0x85845dd1,
+    0x6fa87e4f,0xfe2ce6e0,0xa3014314,0x4e0811a1,
+    0xf7537e82,0xbd3af235,0x2ad7d2bb,0xeb86d391
+  ];
+  const S = [
+    7,12,17,22, 7,12,17,22, 7,12,17,22, 7,12,17,22,
+    5, 9,14,20, 5, 9,14,20, 5, 9,14,20, 5, 9,14,20,
+    4,11,16,23, 4,11,16,23, 4,11,16,23, 4,11,16,23,
+    6,10,15,21, 6,10,15,21, 6,10,15,21, 6,10,15,21
+  ];
+
+  // Парсим блок данных в 16 слов (little-endian)
+  const M = [];
+  for (let i = 0; i < 512; i += 32) {
+    const chunk = data.slice(i, i + 32);
+    if (chunk.length !== 32) {
+      console.error('Ошибка длины слова (ожидалось 32):', chunk.length);
+      break;
+    }
+    const bytes = chunk.match(/.{8}/g);
+    if (!bytes || bytes.length !== 4) {
+      console.error('Ошибка при разбиении на байты:', chunk);
+      break;
+    }
+    const reversed = bytes.reverse().join('');
+    const val = parseInt(reversed, 2);
+    if (isNaN(val)) {
+      console.error('Ошибка преобразования в число:', reversed);
+      break;
+    }
+    M.push(val);
+  }
+  
+  let A = INIT_A;
+  let B = INIT_B;
+  let C = INIT_C;
+  let D = INIT_D;
+
+  const regValuesElems = {
+    A: document.querySelector('#regA .reg-value'),
+    B: document.querySelector('#regB .reg-value'),
+    C: document.querySelector('#regC .reg-value'),
+    D: document.querySelector('#regD .reg-value'),
+  };
+
+  const iterNumberElem = document.getElementById('iterNumber');
+  const roundNameElem = document.getElementById('roundName');
+  const iterationDetailElem = document.getElementById('iterationDetail');
+  const progressFill = document.getElementById('progressFill');
+  const step8btn = document.getElementById('step8btn');
+
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  const autoBtn = document.getElementById('autoBtn');
+  const resetBtn = document.getElementById('resetBtn');
+  const speedSelect = document.getElementById('speedSelect');
+
+  let currentStep = 0;
+  let autoPlayId = null;
+
+  function updateRegisters() {
+    regValuesElems.A.textContent = "0x" + toHex(A);
+    regValuesElems.B.textContent = "0x" + toHex(B);
+    regValuesElems.C.textContent = "0x" + toHex(C);
+    regValuesElems.D.textContent = "0x" + toHex(D);
+  }
+
+  function toHex(num) {
+    return (num >>> 0).toString(16).padStart(8, '0');
+  }
+
+  function getRound(i) {
+    if (i < 16) return 'F';
+    if (i < 32) return 'G';
+    if (i < 48) return 'H';
+    return 'I';
+  }
+
+  function gIndex(i) {
+    if (i < 16) return i;
+    if (i < 32) return (5 * i + 1) % 16;
+    if (i < 48) return (3 * i + 5) % 16;
+    return (7 * i) % 16;
+  }
+
+  function F(x,y,z) { return (x & y) | (~x & z); }
+  function G(x,y,z) { return (x & z) | (y & ~z); }
+  function H(x,y,z) { return x ^ y ^ z; }
+  function I(x,y,z) { return y ^ (x | ~z); }
+
+  function Ffunc(round, b, c, d) {
+    switch(round) {
+      case 'F': return F(b,c,d);
+      case 'G': return G(b,c,d);
+      case 'H': return H(b,c,d);
+      case 'I': return I(b,c,d);
+    }
+  }
+
+  function leftRotate(x, c) {
+    return (x << c) | (x >>> (32 - c));
+  }
+
+  const history = [];
+
+  function md5Step(i, A_in, B_in, C_in, D_in) {
+    const round = getRound(i);
+    const g = gIndex(i);
+    const Fval = Ffunc(round, B_in, C_in, D_in);
+    const s = S[i];
+    const Kval = K[i];
+    const sum = (A_in + Fval + M[g] + Kval) >>> 0;
+    const rotated = leftRotate(sum, s) >>> 0;
+    const B_new = (B_in + rotated) >>> 0;
+    return {
+      A: D_in,
+      B: B_new,
+      C: B_in,
+      D: C_in,
+      round, g, Fval, Kval, s,
+      sum, rotated,
+    };
+  }
+
+  function renderIterationInfo(i, state) {
+    iterNumberElem.textContent = i + 1;
+    roundNameElem.textContent = state.round;
+    roundNameElem.style.color = '#424242';
+    function hex32(num) { return "0x" + toHex(num); }
+    iterationDetailElem.innerHTML = `
+      <p>Функция <span style="color:#0d47a1; font-weight:700;">${state.round}</span> с аргументами:</p>
+      <p>&nbsp;&nbsp;B = <span>${hex32(B)}</span>, C = <span>${hex32(C)}</span>, D = <span>${hex32(D)}</span></p>
+      <p>Рассчёт: <code>F(B,C,D) = ${hex32(state.Fval)}</code></p>
+      <p>Используется слово M[${state.g}]: <code>${hex32(M[state.g])}</code></p>
+      <p>Константа K[${i}]: <code>${hex32(state.Kval)}</code></p>
+      <p>Сдвиг влево на s[${i}] = ${state.s} бит</p>
+      <hr>
+      <p>Вычисляем сумму: <code>(A + F + M[g] + K[i]) = ${hex32(state.sum)}</code></p>
+      <p>После сдвига влево: <code>${hex32(state.rotated)}</code></p>
+      <p>Обновляем регистр B: <code>B = B + сдвинутая сумма = ${hex32(state.B)}</code></p>
+      <p>Перестановка регистров:</p>
+      <p>&nbsp;&nbsp;A ← D = ${hex32(state.A)}</p>
+      <p>&nbsp;&nbsp;D ← C = ${hex32(state.D)}</p>
+      <p>&nbsp;&nbsp;C ← B (старое) = ${hex32(state.C)}</p>
+      <p>&nbsp;&nbsp;B ← обновлённое значение = ${hex32(state.B)}</p>
+    `;
+  }
+
+  function nextStep() {
+    if (currentStep >= 64) return;
+    history.push({A, B, C, D});
+    const res = md5Step(currentStep, A, B, C, D);
+    A = res.A;
+    B = res.B;
+    C = res.C;
+    D = res.D;
+    updateRegisters();
+    renderIterationInfo(currentStep, res);
+    currentStep++;
+    updateProgress();
+    prevBtn.disabled = false;
+    if (currentStep === 64) {
+      nextBtn.disabled = true;
+      autoBtn.disabled = true;
+      step8btn.disabled = false;
+      step8btn.style.opacity = 1;
+      step8btn.style.pointerEvents = "auto";
+      iterationDetailElem.innerHTML += `<p style="margin-top:20px; font-weight:bold; color:#2e7d32;">
+      ✅ Основной цикл второго блока завершён!<br>
+      Текущее состояние буфера (CV2):<br>
+      A = 0x${toHex((INIT_A + A) >>> 0)}<br>
+      B = 0x${toHex((INIT_B + B) >>> 0)}<br>
+      C = 0x${toHex((INIT_C + C) >>> 0)}<br>
+      D = 0x${toHex((INIT_D + D) >>> 0)}<br>
+      Нажмите "Шаг 8" для следующего этапа.
+      </p>`;
+    }
+    if (currentStep === 1) prevBtn.disabled = false;
+  }  function prevStep() {
+    if (currentStep <= 0) return;
+    currentStep--;
+    const prevState = history.pop();
+    if (prevState) {
+      A = prevState.A;
+      B = prevState.B;
+      C = prevState.C;
+      D = prevState.D;
+    }
+    updateRegisters();
+    updateRegistersHighlight();
+    iterationDetailElem.textContent = 'Шаг назад. Итерация: ' + (currentStep) + '. Нажмите "Вперёд" чтобы продолжить.';
+    updateProgress();
+    nextBtn.disabled = false;
+    autoBtn.disabled = false;
+    if (currentStep === 0) prevBtn.disabled = true;
+    step8btn.disabled = true;
+    step8btn.style.opacity = 0.5;
+    step8btn.style.pointerEvents = "none";
+  }
+
+  function updateProgress() {
+    progressFill.style.width = (currentStep / 64) * 100 + '%';
+    progressFill.parentElement.setAttribute('aria-valuenow', currentStep);
+  }
+
+  function autoPlay() {
+    if (autoPlayId) {
+      clearInterval(autoPlayId);
+      autoPlayId = null;
+      autoBtn.textContent = '▶ Авто';
+      nextBtn.disabled = false;
+      prevBtn.disabled = currentStep === 0;
+      return;
+    }
+    autoBtn.textContent = '⏸ Стоп';
+    nextBtn.disabled = true;
+    prevBtn.disabled = true;
+    const speeds = { slow: 800, medium: 400, fast: 120, instant: 0 };
+    const delay = speeds[speedSelect.value] ?? 400;
+    if (delay === 0) {
+      while (currentStep < 64) nextStep();
+      autoPlay();
+      return;
+    }
+    autoPlayId = setInterval(() => {
+      if (currentStep >= 64) {
+        autoPlay();
+        return;
+      }
+      nextStep();
+    }, delay);
+  }
+
+  function reset() {
+    if (autoPlayId) {
+      clearInterval(autoPlayId);
+      autoPlayId = null;
+      autoBtn.textContent = '▶ Авто';
+    }
+    currentStep = 0;
+    history.length = 0;
+    A = INIT_A;
+    B = INIT_B;
+    C = INIT_C;
+    D = INIT_D;
+    updateRegisters();
+    updateRegistersHighlight();
+    iterationDetailElem.textContent = 'Нажмите "Вперёд", чтобы начать обработку блока.';
+    prevBtn.disabled = true;
+    nextBtn.disabled = false;
+    autoBtn.disabled = false;
+    step8btn.disabled = true;
+    step8btn.style.opacity = 0.5;
+    step8btn.style.pointerEvents = "none";
+    updateProgress();
+  }
+
+  step8btn.onclick = () => {
+    const url = `step8.html?text=${encodeURIComponent(text)}&data=${encodeURIComponent(data)}&cvA=${(INIT_A + A) >>> 0}&cvB=${(INIT_B + B) >>> 0}&cvC=${(INIT_C + C) >>> 0}&cvD=${(INIT_D + D) >>> 0}`;
+  window.location.href = url;
+  };
+
+  document.getElementById('step6link').href = `step6.html?text=${encodeURIComponent(text)}`;
+
+
+  nextBtn.onclick = nextStep;
+  prevBtn.onclick = prevStep;
+  autoBtn.onclick = autoPlay;
+  resetBtn.onclick = reset;
+  speedSelect.onchange = () => { if (autoPlayId) autoPlay(); };
+
+  reset();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Шаг 1 — Original Message | MD5pider</title>
+  <style>
+    @keyframes bitFadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: #f4f6f8;
+      color: #333;
+      padding: 80px 20px 20px;
+    }
+
+    header {
+      text-align: center;
+      padding: 20px;
+      background: #4e89ae;
+      color: white;
+      border-radius: 10px;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 30px auto;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    .output {
+      background: #fffde7;
+      padding: 10px;
+      border-left: 4px solid #fdd835;
+      border-radius: 8px;
+      margin: 10px 0;
+      white-space: pre-wrap;
+      font-family: monospace;
+    }
+
+    .bit-square {
+      display: inline-block;
+      padding: 6px 8px;
+      margin: 2px;
+      background-color: #e0e0e0;
+      border: 1px solid #bbb;
+      border-radius: 4px;
+      font-weight: bold;
+      font-family: monospace;
+      position: relative;
+    }
+
+    .bit-square:hover .tooltip {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .tooltip {
+      position: absolute;
+      bottom: 125%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #333;
+      color: white;
+      padding: 4px 8px;
+      font-size: 12px;
+      border-radius: 5px;
+      white-space: nowrap;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s;
+      z-index: 10;
+    }
+
+    .bit-group {
+      display: inline-block;
+      margin-right: 20px;
+      margin-bottom: 8px;
+      padding: 4px;
+      border-radius: 6px;
+      transition: background-color 0.3s;
+    }
+
+    .bit-group:hover {
+      background-color: #c5e1a5;
+    }
+
+    .bit-wrapper {
+      text-align: center;
+      margin-top: 15px;
+    }
+
+    .nav-buttons-top {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      
+      background: #ffffff;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 20px;
+      z-index: 1000;
+    }
+
+    .btn {
+      padding: 12px 24px;
+      background: linear-gradient(to bottom, #4285f4, #3367d6);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 15px;
+      cursor: pointer;
+      margin-right: 50px;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      transition: all 0.3s ease;
+      min-width: 120px;
+    }
+
+    .btn:hover {
+      background: linear-gradient(to bottom, #3367d6, #2a56c5);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.25);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+      background: #2a56c5;
+    }
+
+    .fixed-toggle {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 1000;
+      background: linear-gradient(to bottom, #34a853, #2d8e47);
+    }
+
+    .fixed-toggle:hover {
+      background: linear-gradient(to bottom, #2d8e47, #267d3e);
+    }
+
+    .input-area {
+      margin: 20px auto;
+      text-align: center;
+    }
+
+    input[type="text"] {
+      padding: 10px;
+      font-size: 16px;
+      width: 80%;
+      max-width: 400px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      margin-bottom: 10px;
+    }
+
+    .animated-box {
+      margin-top: 20px;
+      text-align: left;
+      font-size: 18px;
+    }
+    .description-box {
+  background: #e3f2fd;
+  border-left: 6px solid #42a5f5;
+  padding: 20px;
+  border-radius: 10px;
+  margin: 20px auto 30px;
+  max-width: 800px;
+  animation: fadeInDesc 0.8s ease forwards;
+  opacity: 0;
+}
+
+.description-box h2 {
+  color: #1976d2;
+  margin-top: 0;
+}
+
+.description-box p {
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+.description-box code {
+  background: #bbdefb;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: monospace;
+}
+
+@keyframes fadeInDesc {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+/* Описание и анимация */
+.description-box {
+  background: #e3f2fd;
+  border-left: 6px solid #42a5f5;
+  padding: 20px;
+  border-radius: 10px;
+  margin: 20px auto 30px;
+  max-width: 800px;
+  animation: fadeInDesc 0.8s ease forwards;
+  opacity: 0;
+}
+
+.description-box h2 {
+  color: #1976d2;
+  margin-top: 0;
+}
+
+.description-box p {
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+.description-box code {
+  background: #bbdefb;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: monospace;
+}
+
+@keyframes fadeInDesc {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+  </style>
+</head>
+<body>
+
+  <div class="nav-buttons-top">
+    <a href="index.html" class="btn">⬅ Главная</a>
+    <button class="btn" onclick="goToStep2()">Шаг 2 ➡</button>
+  </div>
+
+  <header>
+    🕷️ MD5pider: Шаг 1 — Original Message
+  </header>
+  <div class="description-box">
+    <h2>📘 Что происходит на этом шаге?</h2>
+    <p>
+      На первом этапе алгоритма MD5 мы работаем с так называемым <strong>Original Message</strong> — это исходная строка, которую пользователь хочет зашифровать.
+    </p>
+    <p>
+      Чтобы алгоритм мог обработать эту строку, она сначала <strong>преобразуется в последовательность байтов</strong> с помощью ASCII-кодов, а затем каждый байт переводится в <strong>8-битное двоичное представление</strong>.
+    </p>
+    <p>
+      Например, символ <code>A</code> имеет ASCII-код <code>65</code>, который в двоичном виде выглядит как <code>01000001</code>.
+    </p>
+    <p>
+      Эти биты и составляют двоичную форму вашего сообщения, которая будет дополнена и обработана в следующих шагах.
+    </p>
+  </div>
+  
+  <div class="container">
+    <h2>Что такое "Original Message"?</h2>
+    <p>Это исходная строка, которую пользователь хочет зашифровать. Перед тем как начнётся хеширование, сообщение преобразуется в последовательность байтов (ASCII), а затем в биты.</p>
+
+    <div class="input-area">
+      <input type="text" id="textInput" placeholder="Введите текст, например: Aziz">
+      <br>
+      <button class="btn" onclick="convertToBits()">Преобразовать</button>
+      <a class="btn" href="asciiTable.html" style="margin-left: 10px;">Таблица ASCII</a>
+    </div>
+
+    <div id="asciiBits"></div>
+
+    <div class="animated-box">
+      ✨ Здесь показано поэтапное преобразование первых четырёх символов во внутреннее двоичное представление. Остальные символы можно отобразить по кнопке ниже.
+    </div>
+  </div>
+
+<script>
+  function convertToBits() {
+    let input = document.getElementById('textInput').value.trim();
+    if (input === "") input = "crypto";
+
+    const outputDiv = document.getElementById('asciiBits');
+    let details = '';
+    let bitHTML = '<div class="bit-wrapper">';
+    const limit = Math.min(4, input.length);
+
+    for (let i = 0; i < limit; i++) {
+      const char = input[i] === ' ' ? 'space' : input[i];
+      const code = input.charCodeAt(i);
+      const bits = code.toString(2).padStart(8, '0');
+      details += `${i + 1}) '${char}' → ASCII: ${code} → Биты: ${bits}\n`;
+      bitHTML += '<div class="bit-group">';
+      let delay = 0;
+      for (const bit of bits) {
+        const style = `style="opacity: 0; animation: bitFadeIn 0.3s ${delay}s forwards;"`;
+        bitHTML += `<span class="bit-square" ${style}>${bit}<span class="tooltip">${char} (${code})</span></span>`;
+        delay += 0.05;
+      }
+      bitHTML += '</div>';
+      if ((i + 1) % 2 === 0) bitHTML += '<br>';
+    }
+
+    let hiddenHTML = '';
+    if (input.length > 4) {
+      details += `\n⬇ Нажмите, чтобы показать ещё ${input.length - 4} символ(ов).`;
+      hiddenHTML = '<button class="btn fixed-toggle" id="showBtn" onclick="showMoreBits()">Показать все</button>';
+      window.hiddenBits = '';
+      for (let i = 4; i < input.length; i++) {
+        const char = input[i] === ' ' ? 'space' : input[i];
+        const code = input.charCodeAt(i);
+        const bits = code.toString(2).padStart(8, '0');
+        window.hiddenBits += '<div class="bit-group">';
+        for (const bit of bits) {
+          window.hiddenBits += `<span class="bit-square">${bit}<span class="tooltip">${char} (${code})</span></span>`;
+        }
+        window.hiddenBits += '</div>';
+        if ((i + 1) % 2 === 0) window.hiddenBits += '<br>';
+      }
+      window.hiddenBits = '<div class="bit-wrapper" id="extraBits" style="display:none; opacity:0; transition: opacity 0.5s ease;">' + window.hiddenBits + '</div>';
+    } else {
+      window.hiddenBits = '';
+    }
+
+    bitHTML += '</div>';
+    outputDiv.innerHTML = '<div class="output">' + details + '</div>' + bitHTML + hiddenHTML + window.hiddenBits;
+  }
+
+  function showMoreBits() {
+    const extra = document.getElementById('extraBits');
+    extra.style.display = 'block';
+    setTimeout(() => { extra.style.opacity = '1'; }, 10);
+    const hideBtn = document.createElement('button');
+    hideBtn.className = 'btn fixed-toggle';
+    hideBtn.textContent = 'Скрыть';
+    hideBtn.onclick = function () {
+      extra.style.opacity = '0';
+      setTimeout(() => { extra.style.display = 'none'; }, 300);
+      hideBtn.remove();
+      showBtn.style.display = 'inline-block';
+    };
+    const showBtn = document.getElementById('showBtn');
+    showBtn.style.display = 'none';
+    document.body.appendChild(hideBtn);
+  }
+
+  function goToStep2() {
+    let input = document.getElementById('textInput').value.trim();
+    if (input === "") input = "crypto";
+    const encoded = encodeURIComponent(input);
+    window.location.href = `step2.html?text=${encoded}`;
+  }
+</script>
+
+</body>
+</html>

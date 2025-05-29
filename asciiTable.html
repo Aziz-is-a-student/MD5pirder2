@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ASCII Таблица | MD5pider</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f0f2f5;
+      color: #333;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      color: #2c3e50;
+    }
+    table {
+      margin: 20px auto;
+      border-collapse: collapse;
+      width: 90%;
+      max-width: 800px;
+      background: white;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px 12px;
+      text-align: center;
+    }
+    th {
+      background-color: #4e89ae;
+      color: white;
+    }
+    tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+    .back-btn {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 1000;
+      display: block;
+      margin: 20px auto;
+      text-align: center;
+      background: #1976d2;
+      color: white;
+      padding: 10px 20px;
+      text-decoration: none;
+      border-radius: 6px;
+      width: fit-content;
+    }
+    .back-btn:hover {
+      background: #0d47a1;
+    }
+      tr:hover {
+      background-color: #d0ebff;
+    }
+</style>
+</head>
+<body>
+  <h1>ASCII Таблица</h1>
+  <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 20px;">
+  <table style="flex: 1 1 45%;">
+    <thead>
+      <tr>
+        <th>Символ</th>
+        <th>Десятичное</th>
+        <th>Шестнадцатеричное</th>
+        <th>Бинарное</th>
+      </tr>
+    </thead>
+    <tbody id="ascii-left"></tbody>
+  </table>
+  <table style="flex: 1 1 45%;">
+    <thead>
+      <tr>
+        <th>Символ</th>
+        <th>Десятичное</th>
+        <th>Шестнадцатеричное</th>
+        <th>Бинарное</th>
+      </tr>
+    </thead>
+    <tbody id="ascii-right"></tbody>
+  </table>
+</div>
+  </table>
+  <a class="back-btn" href="step1.html">⬅ Вернуться к шагу 1</a>
+
+  <script>
+  const left = document.getElementById('ascii-left');
+  const right = document.getElementById('ascii-right');
+  for (let i = 32; i <= 126; i++) {
+    const char = i === 32 ? 'space' : String.fromCharCode(i);
+    const decimal = i;
+    const hex = i.toString(16).toUpperCase().padStart(2, '0');
+    const binary = i.toString(2).padStart(8, '0');
+    const row = `
+      <tr>
+        <td>${char}</td>
+        <td>${decimal}</td>
+        <td>0x${hex}</td>
+        <td>${binary}</td>
+      </tr>
+    `;
+    (i <= 79 ? left : right).innerHTML += row;
+  }
+</script>
+</body>
+</html>
+    

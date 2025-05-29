@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MD5pider - Визуальная схема алгоритма MD5</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #1a2980, #26d0ce);
+      color: #333;
+      padding: 20px;
+      min-height: 100vh;
+      background-attachment: fixed;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0 20px;
+    }
+
+    .lang-switcher {
+      display: flex;
+      gap: 10px;
+    }
+
+    .lang-btn {
+      padding: 8px 16px;
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 20px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .lang-btn:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    .lang-btn.active {
+      background: #fff;
+      color: #1a2980;
+      font-weight: bold;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    h1 {
+      text-align: center;
+      background: rgba(255, 255, 255, 0.9);
+      color: #1a2980;
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+      margin-bottom: 20px;
+      font-size: 2.2rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    h1::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 5px;
+      background: linear-gradient(90deg, #ff6b6b, #4ecdc4, #556270);
+    }
+
+    .scheme-button {
+      display: block;
+      margin: 20px auto;
+      padding: 12px 30px;
+      background: #1976d2;
+      color: white;
+      border: none;
+      border-radius: 50px;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .scheme-button:hover {
+      background: #0d47a1;
+      transform: translateY(-3px);
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.25);
+    }
+
+    .image-container {
+      display: none;
+      text-align: center;
+      margin: 20px auto 40px;
+      max-width: 1000px;
+      background: white;
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    .image-container img {
+      width: 100%;
+      border-radius: 10px;
+    }
+
+    .scheme {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 30px;
+      margin-top: 20px;
+    }
+
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+    }
+
+    .block {
+      padding: 18px 22px;
+      background: linear-gradient(145deg, #ffffff, #f0f0f0);
+      border: none;
+      border-radius: 15px;
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+      font-weight: bold;
+      min-width: 160px;
+      text-align: center;
+      transition: all 0.3s;
+      position: relative;
+      overflow: hidden;
+      z-index: 1;
+    }
+
+    .block::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 5px;
+      background: linear-gradient(90deg, #ff6b6b, #4ecdc4);
+      z-index: -1;
+    }
+
+    .block:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .arrow {
+      font-size: 28px;
+      color: white;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      font-weight: bold;
+    }
+
+    .note {
+      background: rgba(255, 243, 205, 0.9);
+      color: #856404;
+      padding: 18px 25px;
+      border-radius: 12px;
+      font-size: 16px;
+      max-width: 800px;
+      margin: 30px auto;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      border-left: 5px solid #ffc107;
+    }
+
+    .block-link {
+      text-decoration: none;
+      color: inherit;
+      display: block;
+    }
+
+    @keyframes slideIn {
+      from { bottom: -200px; opacity: 0; }
+      to { bottom: 20px; opacity: 1; }
+    }
+
+    @keyframes float {
+      0% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+      100% { transform: translateY(0px); }
+    }
+
+    /* Паучок-гид */
+    #spider-guide {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      display: flex;
+      align-items: flex-end;
+      flex-direction: row-reverse;
+      z-index: 1000;
+      animation: slideIn 1s ease-out forwards;
+    }
+
+    .spider-img {
+      width: 150px; /* Уменьшенный размер паучка */
+      height: auto;
+      margin-left: 12px;
+      animation: float 3s ease-in-out infinite;
+    }
+
+    #spider-speech {
+      background: rgba(255, 243, 205, 0.95);
+      border: 2px solid #ffeeba;
+      border-radius: 20px;
+      padding: 18px 22px;
+      max-width: 350px;
+      font-size: 16px;
+      color: #4e3600;
+      box-shadow: 3px 3px 15px rgba(0, 0, 0, 0.2);
+      position: relative;
+    }
+
+    #spider-speech::after {
+      content: "";
+      position: absolute;
+      bottom: 10px;
+      right: -15px;
+      border-width: 10px;
+      border-style: solid;
+      border-color: transparent transparent transparent #ffeeba;
+    }
+
+    .step-number {
+      display: inline-block;
+      background: #1a2980;
+      color: white;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      text-align: center;
+      line-height: 30px;
+      margin-right: 8px;
+      font-weight: bold;
+    }
+
+    /* Адаптивность */
+    @media (max-width: 900px) {
+      .row {
+        flex-direction: column;
+      }
+      
+      .arrow {
+        transform: rotate(90deg);
+        margin: 10px 0;
+      }
+      
+      h1 {
+        font-size: 1.8rem;
+        padding: 15px;
+      }
+      
+      .block {
+        width: 100%;
+        max-width: 300px;
+      }
+    }
+
+    @media (max-width: 600px) {
+      header {
+        flex-direction: column;
+        gap: 15px;
+      }
+      
+      h1 {
+        font-size: 1.5rem;
+      }
+      
+      .lang-switcher {
+        width: 100%;
+        justify-content: center;
+      }
+      
+      .spider-img {
+        width: 50px; /* Еще меньше на мобильных */
+      }
+      
+      #spider-speech {
+        max-width: 250px;
+        font-size: 14px;
+        padding: 12px 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1 id="main-title">🕷️ MD5pider: Визуальная схема алгоритма MD5</h1>
+    <div class="lang-switcher">
+      <button class="lang-btn active" data-lang="ru">Русский</button>
+      <button class="lang-btn" data-lang="en">English</button>
+    </div>
+  </header>
+
+  <button class="scheme-button" id="toggle-scheme-btn">Показать / скрыть оригинальную схему</button>
+  
+  <div class="image-container" id="imageContainer">
+    <img src=".//md5-scheme.png" alt="MD5 схема" />
+  </div>
+
+  <div class="scheme">
+    <div class="row">
+      <a href="step1.html" class="block block-link">
+        <span class="step-number">1</span>
+        <span id="step1-text">Шаг 1:<br>Original Message</span>
+      </a>
+      <span class="arrow">→</span>
+      <a href="step2.html" class="block block-link">
+        <span class="step-number">2</span>
+        <span id="step2-text">Шаг 2:<br>Append Padding Bits (1–512)</span>
+      </a>
+      <span class="arrow">→</span>
+      <a href="step3.html" class="block block-link">
+        <span class="step-number">3</span>
+        <span id="step3-text">Шаг 3:<br>Append Length (64 bits)</span>
+      </a>
+    </div>
+
+    <div class="row">
+      <a href="step4.html" class="block block-link">
+        <span class="step-number">4</span>
+        <span id="step4-text">Шаг 4:<br>Разделение на блоки 512 бит:<br>Y0, Y1, ..., Yq</span>
+      </a>
+    </div>
+
+    <div class="row">
+      <a href="step5.html" class="block block-link">
+        <span class="step-number">5</span>
+        <span id="step5-text">Шаг 5:<br>Initialize MD5 Buffer:<br>A, B, C, D</span>
+      </a>
+      <span class="arrow">→</span>
+      <a href="step6.html" class="block block-link">
+        <span class="step-number">6</span>
+        <span id="step6-text">Шаг 6:<br>HxMD5(Y0)<br>→ CV1</span>
+      </a>
+      <span class="arrow">→</span>
+      <a href="step7.html" class="block block-link">
+        <span class="step-number">7</span>
+        <span id="step7-text">Шаг 7:<br>HxMD5(Y1)<br>→ CV2</span>
+      </a>
+      <span class="arrow">→ ... →</span>
+      <a href="step8.html" class="block block-link">
+        <span class="step-number">8</span>
+        <span id="step8-text">Шаг 8:<br>HxMD5(Yq)<br>→ CVq</span>
+      </a>
+    </div>
+
+    <div class="row">
+      <a href="step9.html" class="block block-link">
+        <span class="step-number">9</span>
+        <span id="step9-text">Шаг 9:<br>128-битный Digest</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="note" id="note-text">
+    Примечание: каждая HxMD5 операция использует 512-битный блок и обновляет буфер состояния (A, B, C, D) на основе предыдущего состояния.
+  </div>
+
+  <!-- Паучок-гид MD5pider -->
+  <div id="spider-guide">
+    <img src=".//md5pider-guide.png" alt="MD5pider Гид" class="spider-img" />
+    <div id="spider-speech">
+      🕷️ Привет! Я — <strong>MD5pider</strong>. Загружаюсь...
+    </div>
+  </div>
+
+  <script>
+    // Объект с переводами
+    const translations = {
+      ru: {
+        title: "MD5pider - Визуальная схема алгоритма MD5",
+        mainTitle: "🕷️ MD5pider: Визуальная схема алгоритма MD5",
+        toggleScheme: "Показать / скрыть оригинальную схему",
+        step1: "Шаг 1:<br>Исходное сообщение",
+        step2: "Шаг 2:<br>Добавление битов заполнения (1–512)",
+        step3: "Шаг 3:<br>Добавление длины (64 бита)",
+        step4: "Шаг 4:<br>Разделение на блоки 512 бит:<br>Y0, Y1, ..., Yq",
+        step5: "Шаг 5:<br>Инициализация буфера MD5:<br>A, B, C, D",
+        step6: "Шаг 6:<br>HxMD5(Y0)<br>→ CV1",
+        step7: "Шаг 7:<br>HxMD5(Y1)<br>→ CV2",
+        step8: "Шаг 8:<br>HxMD5(Yq)<br>→ CVq",
+        step9: "Шаг 9:<br>128-битный дайджест",
+        note: "Примечание: каждая HxMD5 операция использует 512-битный блок и обновляет буфер состояния (A, B, C, D) на основе предыдущего состояния.",
+        phrases: [
+          "🕷️ Привет! Я — MD5pider. Если ты переходишь к шагам без ввода текста, используется слово: <strong>crypto</strong>.",
+          "🧠 На каждом шаге ты увидишь, как работает MD5 — от исходного сообщения до хеша!",
+          "✨ Хочешь пройти всё вручную? Жми на Шаг 1 и начинай с ввода.",
+          "📦 Я помогу тебе запомнить Padding, Length и Digest, не волнуйся!",
+          "🔁 Можно возвращаться назад и менять скорость анимации — смело экспериментируй!"
+        ]
+      },
+      en: {
+        title: "MD5pider - Visual Scheme of MD5 Algorithm",
+        mainTitle: "🕷️ MD5pider: Visual Scheme of MD5 Algorithm",
+        toggleScheme: "Show / Hide Original Scheme",
+        step1: "Step 1:<br>Original Message",
+        step2: "Step 2:<br>Append Padding Bits (1–512)",
+        step3: "Step 3:<br>Append Length (64 bits)",
+        step4: "Step 4:<br>Split into 512-bit blocks:<br>Y0, Y1, ..., Yq",
+        step5: "Step 5:<br>Initialize MD5 Buffer:<br>A, B, C, D",
+        step6: "Step 6:<br>HxMD5(Y0)<br>→ CV1",
+        step7: "Step 7:<br>HxMD5(Y1)<br>→ CV2",
+        step8: "Step 8:<br>HxMD5(Yq)<br>→ CVq",
+        step9: "Step 9:<br>128-bit Digest",
+        note: "Note: Each HxMD5 operation uses a 512-bit block and updates the state buffer (A, B, C, D) based on the previous state.",
+        phrases: [
+          "🕷️ Hi! I'm MD5pider. If you go to the steps without entering text, the word <strong>crypto</strong> is used.",
+          "🧠 At each step, you'll see how MD5 works — from the original message to the hash!",
+          "✨ Want to go through everything manually? Click on Step 1 and start with input.",
+          "📦 I'll help you remember Padding, Length and Digest, don't worry!",
+          "🔁 You can go back and change the animation speed — feel free to experiment!"
+        ]
+      }
+    };
+
+    // Текущий язык
+    let currentLang = 'ru';
+    let spiderPhrases = translations.ru.phrases;
+    let index = 0;
+    let frozen = false;
+
+    // Функция для установки языка
+    function setLanguage(lang) {
+      currentLang = lang;
+      const trans = translations[lang];
+      
+      // Обновляем элементы страницы
+      document.title = trans.title;
+      document.getElementById('main-title').textContent = trans.mainTitle;
+      document.getElementById('toggle-scheme-btn').textContent = trans.toggleScheme;
+      document.getElementById('step1-text').innerHTML = trans.step1;
+      document.getElementById('step2-text').innerHTML = trans.step2;
+      document.getElementById('step3-text').innerHTML = trans.step3;
+      document.getElementById('step4-text').innerHTML = trans.step4;
+      document.getElementById('step5-text').innerHTML = trans.step5;
+      document.getElementById('step6-text').innerHTML = trans.step6;
+      document.getElementById('step7-text').innerHTML = trans.step7;
+      document.getElementById('step8-text').innerHTML = trans.step8;
+      document.getElementById('step9-text').innerHTML = trans.step9;
+      document.getElementById('note-text').textContent = trans.note;
+      
+      // Обновляем фразы паучка
+      spiderPhrases = trans.phrases;
+      document.getElementById('spider-speech').innerHTML = spiderPhrases[0];
+      
+      // Обновляем активную кнопку языка
+      document.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.lang === lang);
+      });
+      
+      // Сохраняем выбор языка
+      localStorage.setItem('md5pider-lang', lang);
+    }
+
+    // Функция для переключения схемы
+    function toggleImage() {
+      const container = document.getElementById('imageContainer');
+      container.style.display = container.style.display === 'none' ? 'block' : 'none';
+    }
+
+    // Инициализация при загрузке страницы
+    document.addEventListener('DOMContentLoaded', function() {
+      // Проверяем сохраненный язык
+      const savedLang = localStorage.getItem('md5pider-lang') || 'ru';
+      setLanguage(savedLang);
+      
+      // Настройка кнопок переключения языка
+      document.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+          setLanguage(this.dataset.lang);
+        });
+      });
+      
+      // Настройка кнопки переключения схемы
+      document.getElementById('toggle-scheme-btn').addEventListener('click', toggleImage);
+      
+      // Настройка паучка-гида
+      const speech = document.getElementById("spider-speech");
+      setInterval(() => {
+        if (!frozen) {
+          index = (index + 1) % spiderPhrases.length;
+          speech.innerHTML = spiderPhrases[index];
+        }
+      }, 6000);
+
+      speech.addEventListener("mouseenter", () => frozen = true);
+      speech.addEventListener("mouseleave", () => frozen = false);
+      
+      // Исправление ссылок для шагов 7 и 8
+      document.querySelectorAll('a[href="step7.html"]').forEach(link => {
+        link.href = "step7.html";
+      });
+      
+      document.querySelectorAll('a[href="step8.html"]').forEach(link => {
+        link.href = "step8.html";
+      });
+    });
+  </script>
+</body>
+</html>

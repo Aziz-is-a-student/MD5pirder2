@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Шаг 3 — Добавление длины | MD5pider</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f4f6f8;
+      margin: 0;
+      padding: 80px 20px 20px;
+      color: #333;
+    }
+    .btn {
+      padding: 10px 16px;
+      background: #1976d2;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-weight: bold;
+      font-size: 14px;
+      cursor: pointer;
+      margin: 0 5px;
+    }
+    .btn:hover {
+      background: #0d47a1;
+    }
+    .btn-reset {
+      background: #d32f2f;
+    }
+    .btn-reset:hover {
+      background: #b71c1c;
+    }
+    .nav-top {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: #fff;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 20px;
+      z-index: 1000;
+    }
+    .container {
+      max-width: 1000px;
+      margin: auto;
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    .bit-square {
+      display: inline-block;
+      padding: 6px 8px;
+      margin: 2px 1px;
+      border-radius: 4px;
+      font-family: monospace;
+    }
+    .bit-padding {
+      background-color: #c8e6c9;
+      border: 1px solid #81c784;
+    }
+    .bit-length {
+      background-color: #bbdefb;
+      border: 1px solid #64b5f6;
+    }
+    .bit-wrapper {
+      text-align: center;
+      margin-top: 20px;
+      word-break: break-word;
+      line-height: 2.2;
+    }
+    .section-title {
+      text-align: center;
+      font-weight: bold;
+      margin-top: 30px;
+      color: #555;
+    }
+    select {
+      padding: 6px 10px;
+      font-size: 14px;
+      border-radius: 6px;
+      margin-left: 10px;
+    }
+    code {
+      background: #e0f7fa;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: monospace;
+    }
+    .info-box {
+      background: #e3f2fd;
+      border-left: 6px solid #2196f3;
+      padding: 16px;
+      border-radius: 10px;
+      margin: 20px 0;
+    }
+    .progress-bar {
+      width: 100%;
+      background: #e0e0e0;
+      border-radius: 10px;
+      overflow: hidden;
+      margin: 20px 0;
+      height: 20px;
+    }
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: #4caf50;
+      transition: width 0.3s;
+    }
+    .progress-container {
+      margin: 30px 0;
+    }
+    .progress-text {
+      text-align: center;
+      margin-top: 5px;
+      font-size: 14px;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+
+<div class="nav-top">
+  <a href="index.html" class="btn">🏠 Главная</a>
+  <a href="step2.html" class="btn">⬅ Шаг 2</a>
+  <a id="step4Btn" class="btn">Шаг 4 ➡</a>
+</div>
+
+<div class="container">
+  <h2>📏 Шаг 3 — Добавление длины сообщения</h2>
+
+  <div class="info-box">
+    <p>
+      Например, вы ввели сообщение <strong>"<span id="textExample">crypto</span>"</strong>. Оно состоит из 
+      <strong><span id="charCount">6</span> символов</strong>.
+      Каждый символ кодируется в <strong>8 бит</strong>, поэтому общая длина исходного сообщения составляет: 
+      <strong><span id="bitCount">48</span> бит</strong>.
+    </p>
+
+    <p>
+      На этом шаге мы добавим <strong>64 бита</strong>, которые представляют длину исходного сообщения <em>до padding-а</em>.
+      Эти биты будут добавлены в конец padded-сообщения.
+    </p>
+
+    <p>
+      Длина записывается в <code>little-endian</code> формате — это значит, что сначала идут младшие байты.
+    </p>
+
+    <p>64-битное двоичное представление длины сообщения:</p>
+    <div class="bit-wrapper" id="bitLengthBinary"></div>
+
+    <p>А так оно выглядит в little-endian виде (байты развёрнуты):</p>
+    <div class="bit-wrapper" id="bitLengthLittleEndian"></div>
+  </div>
+
+  <div class="section-title">🧩 Построение финального блока (padded + длина)</div>
+
+  <div class="progress-container">
+    <div class="progress-bar">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
+    <div class="progress-text" id="progressText">Прогресс: 0/64 бит (0%)</div>
+  </div>
+
+  <div class="bit-wrapper" id="bitDisplay"></div>
+
+  <div class="bit-wrapper">
+    <button class="btn" onclick="addNextBit()">Следующий бит</button>
+    <button class="btn" onclick="autoAdd()">Авто-добавление</button>
+    <button class="btn btn-reset" onclick="resetBits()">Сбросить</button>
+    <label for="speed">Скорость:</label>
+    <select id="speed">
+      <option value="slow">Медленно</option>
+      <option value="medium" selected>Средне</option>
+      <option value="fast">Быстро</option>
+      <option value="instant">Мгновенно</option>
+    </select>
+  </div>
+</div>
+
+<script>
+  const params = new URLSearchParams(window.location.search);
+  let inputText = params.get("text") || "crypto";
+  let paddedBits = (params.get("data") || "").split('');
+
+  document.getElementById("textExample").textContent = inputText;
+  document.getElementById("charCount").textContent = inputText.length;
+
+  if (!/^[01]{448}$/.test(paddedBits.join(''))) {
+    const originalBits = inputText
+      .split('')
+      .map(c => c.charCodeAt(0).toString(2).padStart(8, '0'))
+      .join('')
+      .split('');
+    let pad = ['1'];
+    while ((originalBits.length + pad.length) % 512 !== 448) pad.push('0');
+    paddedBits = [...originalBits, ...pad];
+  }
+
+  const bitDisplay = document.getElementById('bitDisplay');
+  const bitCountSpan = document.getElementById('bitCount');
+  const bitLengthBinaryDiv = document.getElementById('bitLengthBinary');
+  const bitLengthLE = document.getElementById('bitLengthLittleEndian');
+  const speedSelect = document.getElementById('speed');
+  const progressFill = document.getElementById('progressFill');
+  const progressText = document.getElementById('progressText');
+
+  const originalLength = inputText.length * 8;
+  bitCountSpan.textContent = originalLength;
+
+  const lengthBinary = originalLength.toString(2).padStart(64, '0');
+  const bytes = lengthBinary.match(/.{8}/g);
+  const leBytes = [...bytes].reverse();
+  const lengthLEBits = leBytes.join('').split('');
+
+  renderBits(lengthBinary.split(''), bitLengthBinaryDiv, 'bit-length');
+  renderBits(lengthLEBits, bitLengthLE, 'bit-length');
+
+  let allBits = [...paddedBits];
+  let index = 0;
+  let autoAddInterval = null;
+
+  function updateProgress() {
+    const percent = (index / lengthLEBits.length) * 100;
+    progressFill.style.width = percent + '%';
+    progressText.textContent = `Прогресс: ${index}/${lengthLEBits.length} бит (${Math.round(percent)}%)`;
+  }
+
+  function resetBits() {
+    index = 0;
+    clearInterval(autoAddInterval);
+    renderBits(allBits, bitDisplay, 'bit-padding');
+    updateProgress();
+  }
+
+  function addNextBit() {
+    if (index >= lengthLEBits.length) return;
+    const span = document.createElement('span');
+    span.className = 'bit-square bit-length';
+    span.textContent = lengthLEBits[index];
+    bitDisplay.appendChild(span);
+    index++;
+    if ((allBits.length + index) % 8 === 0) bitDisplay.appendChild(document.createTextNode(" "));
+    updateProgress();
+  }
+
+  function autoAdd() {
+    const speed = speedSelect.value;
+    clearInterval(autoAddInterval);
+    
+    if (speed === 'instant') {
+      while (index < lengthLEBits.length) addNextBit();
+    } else {
+      const delays = {
+        slow: 300,
+        medium: 100,
+        fast: 30
+      };
+      autoAddInterval = setInterval(() => {
+        if (index >= lengthLEBits.length) {
+          clearInterval(autoAddInterval);
+          return;
+        }
+        addNextBit();
+      }, delays[speed]);
+    }
+  }
+
+  function renderBits(bits, container, cls) {
+    container.innerHTML = '';
+    bits.forEach((b, i) => {
+      const span = document.createElement('span');
+      span.textContent = b;
+      span.className = 'bit-square ' + cls;
+      container.appendChild(span);
+      if ((i + 1) % 8 === 0) container.appendChild(document.createTextNode(" "));
+    });
+  }
+
+  // Initial render
+  renderBits(allBits, bitDisplay, 'bit-padding');
+  updateProgress();
+  // Обновляем ссылку перехода на шаг 4 с учётом данных
+document.getElementById("step4Btn").href =
+`step4.html?text=${encodeURIComponent(inputText)}&data=${[...allBits, ...lengthLEBits].join('')}`;
+
+</script>
+
+</body>
+</html>

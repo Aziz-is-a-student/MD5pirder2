@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Шаг 9 — Финальный хеш | MD5pider</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f4f6f8;
+      color: #333;
+      margin: 0;
+      padding: 80px 20px 20px;
+    }
+    .nav-top {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      background: #fff;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      padding: 10px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 1000;
+    }
+    .btn {
+      padding: 10px 16px;
+      background: #1976d2;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      user-select: none;
+    }
+    .btn:hover {
+      background: #0d47a1;
+      transform: translateY(-2px);
+    }
+    .btn-success {
+      background: #4caf50;
+    }
+    .btn-success:hover {
+      background: #388e3c;
+    }
+    .container {
+      max-width: 800px;
+      margin: 30px auto;
+      background: white;
+      border-radius: 12px;
+      padding: 40px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+      text-align: center;
+      user-select: text;
+    }
+    h1 {
+      color: #2e7d32;
+      margin-top: 0;
+    }
+    .digest-container {
+      margin: 30px 0;
+      padding: 20px;
+      background: #e8f5e9;
+      border-radius: 10px;
+      border-left: 6px solid #4caf50;
+      font-family: monospace;
+      font-size: 22px;
+      color: #1b5e20;
+      word-break: break-all;
+    }
+    .registers {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 15px;
+      margin: 30px 0;
+    }
+    .register {
+      padding: 12px;
+      background: #e3f2fd;
+      border-radius: 8px;
+      min-width: 150px;
+      font-family: monospace;
+      color: #01579b;
+      font-weight: 600;
+      user-select: text;
+    }
+    .register-label {
+      font-weight: bold;
+      color: #0d47a1;
+      margin-bottom: 5px;
+      user-select: none;
+    }
+    .success-animation {
+      animation: fadeIn 0.5s ease-in-out;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+<div class="nav-top">
+  <a href="#" id="backStep8" class="btn">⬅ Шаг 8</a>
+  <a href="index.html" class="btn">🏠 Главная</a>
+</div>
+
+<div class="container success-animation">
+  <h1>🎉 Финальный MD5 хеш</h1>
+  
+  <p>Сообщение: "<span id="messageText"></span>"</p>
+  
+  <div class="digest-container" id="digestValue">
+    <!-- Здесь будет итоговый хеш -->
+  </div>
+  
+  <button class="btn btn-success" id="copyBtn">Копировать хеш</button>
+  
+  <div class="registers">
+    <div class="register">
+      <div class="register-label">Регистр A</div>
+      <div class="register-value" id="regA">0x00000000</div>
+    </div>
+    <div class="register">
+      <div class="register-label">Регистр B</div>
+      <div class="register-value" id="regB">0x00000000</div>
+    </div>
+    <div class="register">
+      <div class="register-label">Регистр C</div>
+      <div class="register-value" id="regC">0x00000000</div>
+    </div>
+    <div class="register">
+      <div class="register-label">Регистр D</div>
+      <div class="register-value" id="regD">0x00000000</div>
+    </div>
+  </div>
+
+  <p>Алгоритм MD5 успешно завершён! Хеш-сумма вашего сообщения вычислена.</p>
+</div>
+
+<script>
+  const params = new URLSearchParams(window.location.search);
+  const text = params.get('text') || 'crypto';
+  const digest = params.get('digest') || '5ae9b7f211e23aac3df5f2b8f3b8eada'
+
+  // Вставляем сообщение и хеш на страницу
+  document.getElementById('messageText').textContent = text;
+  document.getElementById('digestValue').textContent = digest;
+
+  // Разбиваем хеш на регистры по 8 символов (32 бита)
+  document.getElementById('regA').textContent = '0x' + digest.slice(0, 8);
+  document.getElementById('regB').textContent = '0x' + digest.slice(8, 16);
+  document.getElementById('regC').textContent = '0x' + digest.slice(16, 24);
+  document.getElementById('regD').textContent = '0x' + digest.slice(24, 32);
+
+  // Копирование хеша в буфер обмена с уведомлением
+  const copyBtn = document.getElementById('copyBtn');
+  copyBtn.onclick = () => {
+    navigator.clipboard.writeText(digest)
+      .then(() => {
+        const oldText = copyBtn.textContent;
+        copyBtn.textContent = 'Скопировано!';
+        setTimeout(() => {
+          copyBtn.textContent = oldText;
+        }, 2000);
+      })
+      .catch(() => {
+        alert('Ошибка при копировании');
+      });
+  };
+
+  // Ссылка назад на шаг 8 с передачей параметров
+  const backStep8Link = document.getElementById('backStep8');
+  backStep8Link.href = `step8.html?text=${encodeURIComponent(text)}&digest=${encodeURIComponent(digest)}`;
+
+</script>
+
+</body>
+</html>

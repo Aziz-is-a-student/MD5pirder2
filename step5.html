@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Шаг 5 — Инициализация и разбиение</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f4f6f8;
+      color: #333;
+      margin: 0;
+      padding: 80px 20px 20px;
+    }
+    .nav-top {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      background: #fff;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 20px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      z-index: 1000;
+    }
+    .btn {
+      padding: 10px 16px;
+      background: #1976d2;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-weight: bold;
+      font-size: 14px;
+      cursor: pointer;
+      text-decoration: none;
+      margin: 5px;
+    }
+    .btn:hover {
+      background: #0d47a1;
+    }
+    .container {
+      max-width: 1000px;
+      margin: auto;
+      background: white;
+      border-radius: 12px;
+      padding: 30px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    .info-box, .theory-box {
+      background: #fff9c4;
+      border-left: 6px solid #fbc02d;
+      padding: 16px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+    }
+    .theory-box {
+      background: #e3f2fd;
+      border-left: 6px solid #2196f3;
+    }
+    .section-title {
+      font-weight: bold;
+      color: #5d4037;
+      font-size: 18px;
+      margin-top: 30px;
+      margin-bottom: 10px;
+    }
+    .register-table, table {
+      border-collapse: collapse;
+      font-family: monospace;
+      width: 100%;
+      margin-top: 20px;
+    }
+    th, td {
+      padding: 10px;
+      border: 1px solid #bbb;
+      text-align: center;
+    }
+    th {
+      background: #e0e0e0;
+    }
+    .fade-in {
+      opacity: 0;
+      transform: translateY(10px);
+      animation: fadeInRow 0.4s ease forwards;
+    }
+    @keyframes fadeInRow {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    .hex-block {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-weight: bold;
+      font-family: monospace;
+    }
+    .hex-block.ascii { background: #c8e6c9; color: #2e7d32; }
+    .hex-block.padding { background: #e0f7fa; color: #006064; }
+    .hex-block.length { background: #fff3e0; color: #ef6c00; }
+    .tag {
+      margin-left: 6px;
+      font-size: 12px;
+      padding: 2px 6px;
+      border-radius: 10px;
+      background: #eee;
+      color: #666;
+      font-family: sans-serif;
+    }
+    .tag-ascii { background: #a5d6a7; color: #2e7d32; }
+    .tag-padding { background: #b2ebf2; color: #006064; }
+    .tag-length { background: #ffe0b2; color: #ef6c00; }
+  </style>
+</head>
+<body>
+
+<div class="nav-top">
+  <a href="index.html" class="btn">🏠 Главная</a>
+  <a href="step4.html" class="btn">⬅ Шаг 4</a>
+  <a id="nextStepBtn" class="btn">Шаг 6 ➡</a>
+</div>
+
+<div class="container">
+  <h2>🛠 Шаг 5 — Инициализация регистров и разбиение блока Y₀</h2>
+
+  <div class="info-box" id="messageInfo"></div>
+
+  <div class="theory-box">
+    <h3>📘 Теория: что происходит на этом шаге?</h3>
+    <p>Перед хешированием MD5 инициализирует 4 регистра:</p>
+    <ul style="font-family: monospace; font-size: 16px;">
+      <li>A = 0x67452301</li>
+      <li>B = 0xefcdab89</li>
+      <li>C = 0x98badcfe</li>
+      <li>D = 0x10325476</li>
+    </ul>
+    <p>Блок Y₀ разбивается на 16 слов по 32 бита: M[0]…M[15]. Они участвуют в раундах хеширования.</p>
+  </div>
+
+  <div class="section-title">🧮 Инициализация регистров:</div>
+  <table class="register-table">
+    <tr><th>Регистр</th><th>Начальное значение</th></tr>
+    <tr><td>A</td><td>0x67452301</td></tr>
+    <tr><td>B</td><td>0xefcdab89</td></tr>
+    <tr><td>C</td><td>0x98badcfe</td></tr>
+    <tr><td>D</td><td>0x10325476</td></tr>
+  </table>
+
+  <div class="section-title">📦 Разделение блока Y₀ на 16 слов (по 32 бита):</div>
+  <div style="text-align:center; margin-bottom: 12px;">
+    <button class="btn" onclick="addNextWord()">Следующее слово</button>
+    <button class="btn" onclick="autoFill()">Авто-вставка</button>
+    <button class="btn" onclick="resetTable()">🔁 Сбросить</button>
+  </div>
+
+  <table>
+    <thead>
+      <tr><th>Слово</th><th>HEX</th></tr>
+    </thead>
+    <tbody id="wordsTable"></tbody>
+  </table>
+</div>
+
+<script>
+  const params = new URLSearchParams(window.location.search);
+  const text = params.get("text") || "crypto";
+
+  // Попытка получить данные из sessionStorage с fallback на построение из текста
+  let data = sessionStorage.getItem("step5data");
+  if (!data) {
+    // Нет данных, надо построить из текста
+    const originalBits = text.split('')
+      .map(c => c.charCodeAt(0).toString(2).padStart(8, '0'))
+      .join('')
+      .split('');
+    // Создаём padding
+    let pad = ['1'];
+    while ((originalBits.length + pad.length) % 512 !== 448) pad.push('0');
+    // Длина в 64-бит little-endian
+    const lenBin = (originalBits.length).toString(2).padStart(64, '0');
+    const lenLEBytes = lenBin.match(/.{8}/g).reverse().join('');
+    const lengthBits = lenLEBytes.split('');
+    // Итоговые данные
+    data = [...originalBits, ...pad, ...lengthBits].join('');
+  }
+
+  const originalLength = text.length * 8;
+
+  document.getElementById("messageInfo").innerHTML = `
+    <strong>Исходное сообщение:</strong> "${text}"<br>
+    <strong>Длина блока для обработки:</strong> 512 бит<br>
+    <strong>Обрабатываемый блок:</strong> Y₀
+  `;
+
+  const words = [];
+  const labels = [];
+
+  for (let i = 0; i < 512; i += 32) {
+    const bits = data.slice(i, i + 32);
+    const bytes = bits.match(/.{8}/g);
+    const hexLE = bytes.reverse().map(b => parseInt(b, 2).toString(16).padStart(2, '0')).join('');
+    words.push(hexLE);
+
+    if (i < originalLength) {
+      labels.push("ascii");
+    } else if (i >= 448) {
+      labels.push("length");
+    } else {
+      labels.push("padding");
+    }
+  }
+
+  let wordIndex = 0;
+  let autoInterval = null;
+
+  function addNextWord() {
+    if (wordIndex >= words.length) return;
+    const row = document.createElement("tr");
+    row.className = "fade-in";
+
+    const label = labels[wordIndex];
+    const hex = words[wordIndex];
+    const tag = `<span class="tag tag-${label}">${label}</span>`;
+    const value = `<span class="hex-block ${label}">${hex}</span>`;
+
+    row.innerHTML = `<td>M[${wordIndex}] ${tag}</td><td>${value}</td>`;
+    document.getElementById("wordsTable").appendChild(row);
+    wordIndex++;
+  }
+
+  function autoFill() {
+    clearInterval(autoInterval);
+    autoInterval = setInterval(() => {
+      if (wordIndex >= words.length) {
+        clearInterval(autoInterval);
+      } else {
+        addNextWord();
+      }
+    }, 150);
+  }
+
+  function resetTable() {
+    document.getElementById("wordsTable").innerHTML = '';
+    wordIndex = 0;
+    clearInterval(autoInterval);
+  }
+
+  document.getElementById("nextStepBtn").href =
+    `step6.html?text=${encodeURIComponent(text)}&data=${data}`;
+</script>
+
+</body>
+</html>
