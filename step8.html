@@ -187,32 +187,6 @@
       text-align: center;
       user-select: none;
     }
-    .final-digest {
-      max-width: 850px;
-      margin: 30px auto;
-      padding: 20px;
-      background: #e8f5e9;
-      border-left: 6px solid #4caf50;
-      border-radius: 8px;
-      text-align: center;
-      font-family: monospace;
-      font-size: 18px;
-      box-shadow: 0 4px 10px rgba(76, 175, 80, 0.2);
-    }
-    .digest-value {
-      font-weight: bold;
-      color: #2e7d32;
-      font-size: 20px;
-      margin: 15px 0;
-      word-break: break-all;
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    .fade-in {
-      animation: fadeIn 0.5s ease forwards;
-    }
     .buffer-update {
       max-width: 850px;
       margin: 20px auto;
@@ -222,6 +196,13 @@
       border-radius: 8px;
       font-family: monospace;
       font-size: 16px;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .fade-in {
+      animation: fadeIn 0.5s ease forwards;
     }
   </style>
 </head>
@@ -352,7 +333,6 @@
     M.push(parseInt(littleEndianWord, 2));
   }
 
-
   // Текущие значения регистров
   let A = INIT_A, B = INIT_B, C = INIT_C, D = INIT_D;
 
@@ -378,7 +358,6 @@
 
   let currentStep = 0;
   let autoPlayId = null;
-  let digest = '';
   const history = [];
 
   // Вспомогательные функции
@@ -449,46 +428,58 @@
     iterNumberElem.textContent = currentStep;
     roundNameElem.textContent = stepData.round;
 
+    const hex32 = num => "0x" + toHex(num);
+    const bitStart = stepData.g * 32;
+    const rawBits = data.slice(bitStart, bitStart + 32);
+    const leBytes = rawBits.match(/.{8}/g).reverse().join(' '); // little-endian представление
+
     iterationDetailElem.innerHTML = `
-      <strong>Итерация ${currentStep}:</strong> (Раунд ${stepData.round})<br>
-      F = (B ${stepData.round === 'F' ? 'AND' : stepData.round === 'G' ? 'AND' : stepData.round === 'H' ? 'XOR' : 'OR'} 
-           C ${stepData.round === 'F' ? 'OR' : stepData.round === 'G' ? 'AND' : stepData.round === 'H' ? 'XOR' : 'XOR'} 
-           D) = 0x${toHex(stepData.Fval)}<br>
-      Сумма: A + F + M[${stepData.g}] + K[${currentStep-1}] = 0x${toHex(stepData.sum)}<br>
-      Циклический сдвиг влево на ${stepData.s}: 0x${toHex(stepData.rotated)}<br>
-      Новое значение B: B + сдвиг = 0x${toHex(B)}
+        <p>Раунд: <strong style="color:#0d47a1;">${stepData.round}</strong> &nbsp;&nbsp;
+           g = <strong>${stepData.g}</strong> &nbsp;&nbsp;
+           s = <strong>${stepData.s}</strong> бит</p>
+
+        <hr>
+
+        <p><strong>Слово M[${stepData.g}]</strong> из блока Y<sub>q</sub>:</p>
+        <p>Исходные биты: <code>${rawBits}</code><br />
+           Развёрнуто (little-endian): <code>${leBytes}</code><br />
+           Значение: <code>${hex32(stepData.Mval)}</code></p>
+
+        <p><strong>Константа K[${currentStep-1}]</strong>: <code>${hex32(stepData.Kval)}</code><br />
+           Формула: <code>K[${currentStep-1}] = floor(2^32 × |sin(${currentStep})|)</code></p>
+
+        <hr>
+
+        <p><strong>Функция ${stepData.round}(B, C, D)</strong>:</p>
+        <p>B = ${hex32(B)}, C = ${hex32(C)}, D = ${hex32(D)}</p>
+        <p>Результат: <code>${hex32(stepData.Fval)}</code></p>
+
+        <hr>
+
+        <p><strong>Вычисление:</strong></p>
+        <p><code>A + F + M[g] + K[i] = ${hex32(stepData.sum)}</code></p>
+        <p>После сдвига влево на ${stepData.s} бит: <code>${hex32(stepData.rotated)}</code></p>
+        <p>Новое значение B: <code>B = B + сдвиг = ${hex32(B)}</code></p>
+
+        <hr>
+
+        <p><strong>Перестановка регистров:</strong></p>
+        <p>A ← D = ${hex32(A)}<br />
+           D ← C = ${hex32(D)}<br />
+           C ← B (старое) = ${hex32(C)}<br />
+           B ← обновлённое значение = ${hex32(B)}</p>
     `;
 
     progressFill.style.width = `${(currentStep / 64) * 100}%`;
 
     if (currentStep === 64) {
-      nextBtn.disabled = true;
-      autoBtn.disabled = true;
-      step9btn.disabled = false;
-      step9btn.style.opacity = "1";
-      step9btn.style.pointerEvents = "auto";
-      showBufferUpdate();
-      digest = toLittleEndianHex((INIT_A + A) >>> 0) + 
-               toLittleEndianHex((INIT_B + B) >>> 0) + 
-               toLittleEndianHex((INIT_C + C) >>> 0) + 
-               toLittleEndianHex((INIT_D + D) >>> 0);
+        nextBtn.disabled = true;
+        autoBtn.disabled = true;
+        step9btn.disabled = false;
+        step9btn.style.opacity = "1";
+        step9btn.style.pointerEvents = "auto";
+        showBufferUpdate();
     }
-  }
-
-  function showBufferUpdate() {
-    const AA = (INIT_A + A) >>> 0;
-    const BB = (INIT_B + B) >>> 0;
-    const CC = (INIT_C + C) >>> 0;
-    const DD = (INIT_D + D) >>> 0;
-
-    bufferUpdateText.innerHTML = `
-      <strong>Обновление буфера:</strong><br>
-      A = A<sub>init</sub> + A<sub>current</sub> = 0x${toHex(INIT_A)} + 0x${toHex(A)} = 0x${toHex(AA)}<br>
-      B = B<sub>init</sub> + B<sub>current</sub> = 0x${toHex(INIT_B)} + 0x${toHex(B)} = 0x${toHex(BB)}<br>
-      C = C<sub>init</sub> + C<sub>current</sub> = 0x${toHex(INIT_C)} + 0x${toHex(C)} = 0x${toHex(CC)}<br>
-      D = D<sub>init</sub> + D<sub>current</sub> = 0x${toHex(INIT_D)} + 0x${toHex(D)} = 0x${toHex(DD)}
-    `;
-    bufferUpdateContainer.style.display = "block";
   }
 
   // Управление шагами
@@ -550,7 +541,6 @@
     step9btn.disabled = true;
     step9btn.style.opacity = "0.5";
     step9btn.style.pointerEvents = "none";
-    bufferUpdateContainer.style.display = "none";
   }
 
   function autoPlay() {
@@ -606,13 +596,12 @@
     step9btn.disabled = true;
     step9btn.style.opacity = "0.5";
     step9btn.style.pointerEvents = "none";
-    bufferUpdateContainer.style.display = "none";
   }
 
   // Навигация
   document.getElementById('step7link').href = `step7.html?text=${encodeURIComponent(text)}&data=${encodeURIComponent(data)}`;
   step9btn.onclick = () => {
-    window.location.href = `step9.html?text=${encodeURIComponent(text)}&digest=${digest}`;
+    window.location.href = `step9.html?text=${encodeURIComponent(text)}`;
   };
 
   // Обработчики событий
